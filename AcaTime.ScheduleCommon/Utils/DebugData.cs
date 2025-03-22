@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AcaTime.ScheduleCommon.Utils
+{
+    /// <summary>
+    /// Помічник з формування відлагоджувальної інформації про час, витрачений на виконання кроків процедури
+    /// </summary>
+    public class DebugData
+    {
+        private readonly Stopwatch sw;
+        private readonly string _operation;
+        private readonly bool debug;
+        private readonly Dictionary<string, long> steps;
+        private string _lastStep;
+
+        /// <summary>
+        /// Останній залогований крок
+        /// </summary>
+        public string LastStep => _lastStep;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operation">Код операції для якої формуємо статистику по крокам</param>
+        public DebugData(string operation, bool debug = true)
+        {
+            _operation = operation;
+            this.debug = debug;
+            steps = new Dictionary<string, long>();
+            sw = new Stopwatch();
+            sw.Start();
+        }
+
+        public long GetElapsed() => steps.Sum(p => p.Value);
+
+        /// <summary>
+        /// Записати інформацію про крок. Кроку буде співставлено час, що минув з останнього виклику цієї функції 
+        /// або з моменту створення цього екземпляру.
+        /// Якщо вже був крок з таким кодом, час для коду сумується
+        /// </summary>
+        /// <param name="val">Назва кроку</param>
+        public long Step(string val)
+        {
+            if (!debug) return 0;
+            _lastStep = val;
+            long ms = sw.ElapsedMilliseconds;
+            sw.Restart();
+            long res = ms;
+            if (steps.ContainsKey(val))
+            {
+                ms += steps[val];
+            }
+            steps[val] = ms;
+         
+            return res;
+        }
+
+        /// <summary>
+        /// Виведення інформації в рядок
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return ToString(true);
+        }
+
+        /// <summary>
+        /// Виведення інформації в рядок
+        /// </summary>
+        /// <param name="withTotal">Виводити чи ні загальну суму часу всіх кроків</param>
+        /// <param name="totalCaption">Назва параметра для загальної суми</param>
+        /// <returns></returns>
+        public string ToString(bool withTotal, string totalCaption = "All")
+        {
+            if (!debug)
+            {
+                return $"all {sw.ElapsedMilliseconds}";  
+            };
+
+            var stepStr = string.Join(" ", steps.Select(p => $"{p.Key}:{p.Value}ms"));
+            if (withTotal)
+                return $"{_operation} ({stepStr} {totalCaption}:{steps.Sum(p => p.Value)}ms)";
+            else
+                return $"{_operation} ({stepStr})";
+        }
+    }
+}

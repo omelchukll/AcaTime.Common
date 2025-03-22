@@ -24,5 +24,9 @@
         /// Довжина серії занять
         /// </summary>
         int LessonSeriesLength { get; }
+
+
+        /// <summary>Предмет, закріплений за групами.</summary>
+        IGroupSubject GroupSubject { get; }
     }
 }
