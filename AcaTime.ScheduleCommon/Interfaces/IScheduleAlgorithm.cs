@@ -25,5 +25,17 @@ namespace AcaTime.ScheduleCommon.Interfaces
         /// </summary>
         /// <returns></returns>
         string GetStatistics();
+
+        /// <summary>
+        /// Ім'я алгоритму
+        /// </summary>
+        /// <returns></returns>
+        string GetName();   
+
+        /// <summary>
+        /// Отримує список параметрів, які використовує алгоритм
+        /// </summary>
+        /// <returns>Список параметрів з описом, типом та значенням за замовчуванням</returns>
+        List<AlgorithmParameterDTO> GetParameters();
     }
 }

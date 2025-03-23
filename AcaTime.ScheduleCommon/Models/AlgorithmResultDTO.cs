@@ -25,6 +25,14 @@ namespace AcaTime.ScheduleCommon.Models
         /// Ім'я алгоритму
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Помилка
+        /// </summary>
+        public string? Error { get; set; }
+
+
+
     }
 
 
