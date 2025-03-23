@@ -10,7 +10,7 @@ namespace AcaTime.ScheduleCommon.Models.Constraints
         public Func<IFacultySeason, IEnumerable<IScheduleSlot>> SelectorFunc { get; set; }
 
         public Func<IScheduleSlot, bool> Func { get; set; }
-        public string? MainScript { get; set; }
+    
 
         public IEnumerable<IScheduleSlot> Select(IFacultySeason faculty) => SelectorFunc (faculty);
 

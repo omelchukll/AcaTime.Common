@@ -13,5 +13,11 @@
 
         /// <summary>Тип правила.</summary>
         public long RuleType { get; set; }
+
+        /// <summary>Скрипт вибору об'єктів для обмеження.</summary>
+        public string? SelectorScript { get; set; }
+
+        /// <summary>Скрипт перевірки об'єктів для обмеження.</summary>
+        public string? MainScript { get; set; }
     }
 }

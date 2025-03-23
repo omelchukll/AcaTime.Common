@@ -1,20 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using AcaTime.ScriptModels;
-
-namespace AcaTime.ScheduleCommon.Models
+namespace AcaTime.ScheduleCommon.Models.Api
 {
     /// <summary>
-    /// DTO для представлення предмету.
+    /// Спрощена версія DTO предмета
     /// </summary>
-    public class SubjectDTO : ISubject
+    public class SimplifiedSubjectDTO
     {
         /// <summary>Ідентифікатор предмету.</summary>
         public long Id { get; set; }
 
         /// <summary>Назва предмету.</summary>
         public string Name { get; set; }
-
-        
 
         /// <summary>Кількість пар по замовчуванню для однієї групи.</summary>
         public int NumberOfLessons { get; set; }
@@ -33,7 +28,5 @@ namespace AcaTime.ScheduleCommon.Models
 
         /// <summary>Скорочена назва типу предмету.</summary>
         public string SubjectTypeShortName { get; set; }
-
     }
-
-}
+} 

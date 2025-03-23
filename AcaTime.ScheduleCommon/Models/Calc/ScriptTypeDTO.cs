@@ -1,4 +1,4 @@
-﻿namespace AcaTime.ScheduleCommon.Models
+﻿namespace AcaTime.ScheduleCommon.Models.Calc
 {
     /// <summary>
     /// Модель для довідника типів скриптів.

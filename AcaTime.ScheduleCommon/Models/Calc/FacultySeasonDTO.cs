@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AcaTime.ScriptModels;
 
-namespace AcaTime.ScheduleCommon.Models
+namespace AcaTime.ScheduleCommon.Models.Calc
 {
     /// <summary>
     /// DTO для представлення факультету та сезону.

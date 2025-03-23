@@ -1,4 +1,4 @@
-﻿using AcaTime.ScheduleCommon.Models;
+﻿using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
 using Microsoft.Extensions.Logging;
 

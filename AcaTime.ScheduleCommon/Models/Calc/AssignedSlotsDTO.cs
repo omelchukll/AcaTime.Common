@@ -1,6 +1,6 @@
 ﻿using AcaTime.ScriptModels;
 
-namespace AcaTime.ScheduleCommon.Models
+namespace AcaTime.ScheduleCommon.Models.Calc
 {
     /// <summary>
     /// Призначені слоти

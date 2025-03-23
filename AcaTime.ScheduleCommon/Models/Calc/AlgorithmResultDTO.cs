@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcaTime.ScheduleCommon.Models
+namespace AcaTime.ScheduleCommon.Models.Calc
 {
     /// <summary>
     /// DTO для результату роботи алгоритму.

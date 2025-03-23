@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcaTime.ScriptModels;
 
-namespace AcaTime.ScheduleCommon.Models
+namespace AcaTime.ScheduleCommon.Models.Calc
 {
 
     /// <summary>

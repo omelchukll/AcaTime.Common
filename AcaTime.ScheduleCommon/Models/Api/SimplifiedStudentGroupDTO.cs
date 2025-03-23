@@ -1,12 +1,9 @@
-﻿using AcaTime.ScriptModels;
-using System.ComponentModel.DataAnnotations;
-
-namespace AcaTime.ScheduleCommon.Models
+namespace AcaTime.ScheduleCommon.Models.Api
 {
     /// <summary>
-    /// DTO для представлення групи або підгрупи студентів для предмету.
+    /// Спрощена версія DTO групи студентів
     /// </summary>
-    public class StudentLessonGroupDTO : IStudentLessonGroup
+    public class SimplifiedStudentGroupDTO
     {
         /// <summary>Ідентифікатор групи.</summary>
         public long Id { get; set; }
@@ -26,7 +23,7 @@ namespace AcaTime.ScheduleCommon.Models
         /// <summary>Назва варіанту розподілу (якщо є).</summary>
         public string? SubgroupVariantName { get; set; }
 
-        /// <summary>На скільки підгруп ділить варіант розподілу. Якщо розподілу немає то тут буде 1</summary>
+        /// <summary>На скільки підгруп ділить варіант розподілу.</summary>
         public int SubgroupCount { get; set; }
 
         /// <summary>Ідентифікатор курсу.</summary>
@@ -40,7 +37,5 @@ namespace AcaTime.ScheduleCommon.Models
 
         /// <summary>Назва освітньої програми.</summary>
         public string EducationalProgramName { get; set; }
-
     }
-
-}
+} 
