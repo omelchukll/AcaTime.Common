@@ -90,7 +90,14 @@ namespace AcaTime.ScheduleCommon.Utils
                 DisciplineName = subject.DisciplineName,
                 SubjectTypeId = subject.SubjectTypeId,
                 SubjectTypeName = subject.SubjectTypeName,
-                SubjectTypeShortName = subject.SubjectTypeShortName
+                SubjectTypeShortName = subject.SubjectTypeShortName,
+                DefinedSeries = subject.DefinedSeries?.Select(s => new SimplifiedSubjectSeriesDTO
+                {
+                    NumberOfLessons = s.NumberOfLessons,
+                    SeriesNumber = s.SeriesNumber,
+                    SplitType = (int)s.SplitType,
+                    StartInAnyWeek = s.StartInAnyWeek
+                }).ToList() ?? new List<SimplifiedSubjectSeriesDTO>()
             };
         }
 

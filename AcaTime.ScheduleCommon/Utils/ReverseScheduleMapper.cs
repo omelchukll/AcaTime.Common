@@ -6,6 +6,7 @@ using AcaTime.ScheduleCommon.Models;
 using AcaTime.ScheduleCommon.Models.Api;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
+using AcaTime.ScriptModels;
 
 namespace AcaTime.ScheduleCommon.Utils
 {
@@ -106,7 +107,14 @@ namespace AcaTime.ScheduleCommon.Utils
                 DisciplineName = simplifiedSubject.DisciplineName,
                 SubjectTypeId = simplifiedSubject.SubjectTypeId,
                 SubjectTypeName = simplifiedSubject.SubjectTypeName,
-                SubjectTypeShortName = simplifiedSubject.SubjectTypeShortName
+                SubjectTypeShortName = simplifiedSubject.SubjectTypeShortName,
+                DefinedSeries = simplifiedSubject.DefinedSeries?.Select(s => new SubjectSeriesDto
+                {
+                    NumberOfLessons = s.NumberOfLessons,
+                    SeriesNumber = s.SeriesNumber,
+                    SplitType = (SubjectSeriesSplitType)s.SplitType,
+                    StartInAnyWeek = s.StartInAnyWeek   
+                }).ToList() ?? new List<SubjectSeriesDto>()
             };
         }
 

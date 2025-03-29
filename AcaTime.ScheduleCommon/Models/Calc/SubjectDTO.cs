@@ -34,6 +34,13 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// <summary>Скорочена назва типу предмету.</summary>
         public string SubjectTypeShortName { get; set; }
 
+        /// <summary>
+        /// Список серій уроків, які вже визначені для цього предмету.
+        /// </summary>
+        public List<SubjectSeriesDto> DefinedSeries { get; set; } = new List<SubjectSeriesDto>();
+
+        
+        IReadOnlyList<ISubjectSeriesDto> ISubject.DefinedSeries => DefinedSeries;
     }
 
 }

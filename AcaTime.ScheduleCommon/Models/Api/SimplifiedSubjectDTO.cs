@@ -28,5 +28,8 @@ namespace AcaTime.ScheduleCommon.Models.Api
 
         /// <summary>Скорочена назва типу предмету.</summary>
         public string SubjectTypeShortName { get; set; }
+
+        /// <summary>Список серій уроків, які вже визначені для цього предмету.</summary>
+        public List<SimplifiedSubjectSeriesDTO> DefinedSeries { get; set; } = new List<SimplifiedSubjectSeriesDTO>();
     }
 } 

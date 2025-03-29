@@ -29,5 +29,8 @@ namespace AcaTime.ScriptModels
         /// <summary>Скорочена назва типу предмету.</summary>
         string SubjectTypeShortName { get; }
 
+        /// <summary>Список серій уроків, які вже визначені для цього предмету.</summary>
+        IReadOnlyList<ISubjectSeriesDto> DefinedSeries { get; }
+
     }
 }
