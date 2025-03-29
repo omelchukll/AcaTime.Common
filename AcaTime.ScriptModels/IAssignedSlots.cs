@@ -13,13 +13,13 @@ namespace AcaTime.ScriptModels
         IReadOnlyList<IScheduleSlot> Slots { get; }
 
         /// <summary>
-        /// Призначені слоти за викладачем
+        /// Отримати призначені слоти за викладачем по ID
         /// </summary>
-        IReadOnlyDictionary<long, IReadOnlyList<IScheduleSlot>> SlotsByTeacher { get; }
+        IReadOnlyList<IScheduleSlot> GetSlotsByTeacher(long teacherId);
 
         /// <summary>
-        /// Призначені слоти за групою
+        /// Отримати призначені слоти за групою по ID
         /// </summary>
-        IReadOnlyDictionary<long, IReadOnlyList<IScheduleSlot>> SlotsByGroup { get; }
+        IReadOnlyList<IScheduleSlot> GetSlotsByGroup(long groupId);
     }
 }
