@@ -27,7 +27,9 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         [Display(Name = "Максимаотна кількість пар в день")]
         public int MaxLessonsPerDay { get; set; }
 
+        /// <summary>Список аудиторій.</summary>
+        public List<ClassroomDTO> Classrooms { get; set; } = new List<ClassroomDTO>();
+
         IReadOnlyList<IGroupSubject> IFacultySeason.GroupSubjects => GroupSubjects;
     }
-
 }

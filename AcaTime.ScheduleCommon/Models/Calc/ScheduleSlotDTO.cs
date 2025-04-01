@@ -36,6 +36,11 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         public int LessonSeriesLength { get; set; } = 1;
 
         IGroupSubject IScheduleSlot.GroupSubject => GroupSubject;
+
+        /// <summary>
+        /// Аудиторія для заняття
+        /// </summary>
+        public ClassroomDTO? Classroom { get; set; }
     }
 
 }

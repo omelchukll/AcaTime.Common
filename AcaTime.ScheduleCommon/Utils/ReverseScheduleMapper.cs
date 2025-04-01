@@ -6,6 +6,7 @@ using AcaTime.ScheduleCommon.Models;
 using AcaTime.ScheduleCommon.Models.Api;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
+using AcaTime.ScheduleCommon.Services;
 using AcaTime.ScriptModels;
 
 namespace AcaTime.ScheduleCommon.Utils

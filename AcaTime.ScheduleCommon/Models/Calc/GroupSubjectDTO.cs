@@ -24,6 +24,11 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// <summary>Список розкладених уроків.</summary>
         public List<ScheduleSlotDTO> ScheduleSlots { get; set; } = new List<ScheduleSlotDTO>();
 
+        /// <summary>
+        /// Кількість студентів в групі
+        /// </summary>
+        public int StudentCount { get; set; }
+
         ITeacher IGroupSubject.Teacher => Teacher;
 
         ISubject IGroupSubject.Subject => Subject;

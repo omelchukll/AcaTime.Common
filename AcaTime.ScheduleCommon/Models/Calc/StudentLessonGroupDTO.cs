@@ -41,6 +41,9 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// <summary>Назва освітньої програми.</summary>
         public string EducationalProgramName { get; set; }
 
+        /// <summary>Кількість студентів в групі</summary>
+        public int StudentCount { get; set; }
+
     }
 
 }

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace AcaTime.ScheduleCommon.Utils
+namespace AcaTime.ScheduleCommon.Services
 {
     /// <summary>
     /// Сервіс для виконання та валідації скриптів.

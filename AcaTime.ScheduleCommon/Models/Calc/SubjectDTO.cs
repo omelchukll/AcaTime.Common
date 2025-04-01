@@ -41,6 +41,14 @@ namespace AcaTime.ScheduleCommon.Models.Calc
 
         
         IReadOnlyList<ISubjectSeriesDto> ISubject.DefinedSeries => DefinedSeries;
+
+        /// <summary>
+        /// Не потребує аудиторії
+        /// </summary>
+        public bool NoClassroom { get; set; } = false;
+
+        /// <summary>Список обраних типів аудиторій.</summary>
+        public List<SelectedClassroomTypeDTO> ClassroomTypes { get; set; } = new List<SelectedClassroomTypeDTO>();
     }
 
 }
