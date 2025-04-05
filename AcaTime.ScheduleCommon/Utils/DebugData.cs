@@ -23,6 +23,8 @@ namespace AcaTime.ScheduleCommon.Utils
         /// </summary>
         public string LastStep => _lastStep;
 
+        public long lastTicks;
+
         /// <summary>
         /// 
         /// </summary>
@@ -34,6 +36,7 @@ namespace AcaTime.ScheduleCommon.Utils
             steps = new Dictionary<string, long>();
             sw = new Stopwatch();
             sw.Start();
+            lastTicks = sw.ElapsedTicks;
         }
 
         public long GetElapsed() => steps.Sum(p => p.Value);
@@ -48,8 +51,11 @@ namespace AcaTime.ScheduleCommon.Utils
         {
             if (!debug) return 0;
             _lastStep = val;
-            long ms = sw.ElapsedMilliseconds;
-            sw.Restart();
+            
+            var currentTicks = sw.ElapsedTicks;
+            long ms = currentTicks - lastTicks;
+            lastTicks = currentTicks;
+      
             long res = ms;
             if (steps.ContainsKey(val))
             {
@@ -82,9 +88,9 @@ namespace AcaTime.ScheduleCommon.Utils
                 return $"all {sw.ElapsedMilliseconds}";  
             };
 
-            var stepStr = string.Join(" ", steps.Select(p => $"{p.Key}:{p.Value}ms"));
+            var stepStr = string.Join(" ", steps.Select(p => $"{p.Key}:{  (int)(p.Value * 1000 / Stopwatch.Frequency )}ms"));
             if (withTotal)
-                return $"{_operation} ({stepStr} {totalCaption}:{steps.Sum(p => p.Value)}ms)";
+                return $"{_operation} ({stepStr} {totalCaption}:{ (int)(steps.Sum(p => p.Value) * 1000 / Stopwatch.Frequency)}ms)";
             else
                 return $"{_operation} ({stepStr})";
         }

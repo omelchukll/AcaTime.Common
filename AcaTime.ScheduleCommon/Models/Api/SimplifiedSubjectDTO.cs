@@ -1,3 +1,5 @@
+using AcaTime.ScheduleCommon.Models.Calc;
+
 namespace AcaTime.ScheduleCommon.Models.Api
 {
     /// <summary>
@@ -31,5 +33,14 @@ namespace AcaTime.ScheduleCommon.Models.Api
 
         /// <summary>Список серій уроків, які вже визначені для цього предмету.</summary>
         public List<SimplifiedSubjectSeriesDTO> DefinedSeries { get; set; } = new List<SimplifiedSubjectSeriesDTO>();
+
+
+        /// <summary>
+        /// Не потребує аудиторії
+        /// </summary>
+        public bool NoClassroom { get; set; } = false;
+
+        /// <summary>Список обраних типів аудиторій.</summary>
+        public List<SimplifiedSelectedClassroomTypeDTO> ClassroomTypes { get; set; } = new List<SimplifiedSelectedClassroomTypeDTO>();
     }
 } 

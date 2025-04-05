@@ -1,7 +1,7 @@
 ﻿using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
 
-namespace AcaTime.ScheduleCommon.Interfaces
+namespace AcaTime.ScheduleCommon.Abstract
 {
     /// <summary>
     /// Інтерфейс для отримання та збереження даних для побудови розкладу
@@ -13,12 +13,12 @@ namespace AcaTime.ScheduleCommon.Interfaces
         /// </summary>
         /// <param name="facultySeasonId"></param>
         /// <returns></returns>
-        Task<FacultySeasonDTO> GetFacultySeasonScheduleAsync(long facultySeasonId);
+     //   Task<FacultySeasonDTO> GetFacultySeasonScheduleAsync(long facultySeasonId);
 
         /// <summary>
         /// Функції користувача
         /// </summary>        
-        Task<UserFunctions> GetUserFunctions(long facultySeasonId);
+     //   Task<UserFunctions> GetUserFunctions(long facultySeasonId);
 
         /// <summary>
         /// Збереження помилки

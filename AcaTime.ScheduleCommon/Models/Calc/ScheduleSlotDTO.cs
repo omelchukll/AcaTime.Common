@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcaTime.ScheduleCommon.Models.Api;
 using AcaTime.ScriptModels;
 
 namespace AcaTime.ScheduleCommon.Models.Calc

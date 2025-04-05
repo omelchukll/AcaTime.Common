@@ -1,4 +1,4 @@
-﻿using AcaTime.ScheduleCommon.Interfaces;
+﻿using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
 using AcaTime.ScheduleCommon.Utils;
@@ -22,13 +22,13 @@ namespace AcaTime.ScheduleCommon.Services
         /// </summary>
         /// <param name="facultySeasonId"></param>
         /// <returns></returns>
-        private async Task<(FacultySeasonDTO, UserFunctions)> Load(long facultySeasonId)
-        {
-            var root = await dataService.GetFacultySeasonScheduleAsync(facultySeasonId);
-            GenerateScheduleSlots(root);
-            var userFunctions = await dataService.GetUserFunctions(facultySeasonId);
-            return (root, userFunctions);
-        }
+        //private async Task<(FacultySeasonDTO, UserFunctions)> Load(long facultySeasonId)
+        //{
+        //    var root = await dataService.GetFacultySeasonScheduleAsync(facultySeasonId);
+        //    GenerateScheduleSlots(root);
+        //    var userFunctions = await dataService.GetUserFunctions(facultySeasonId);
+        //    return (root, userFunctions);
+        //}
 
         /// <summary>
         /// Генерує слоти для розкладу
@@ -57,7 +57,7 @@ namespace AcaTime.ScheduleCommon.Services
 
         public void ChecAndPatchkData(FacultySeasonDTO root, bool ignoreClassrooms = false)
         {
-           
+
             foreach (var groupSubject in root.GroupSubjects)
             {
 
@@ -81,7 +81,7 @@ namespace AcaTime.ScheduleCommon.Services
                 if (ignoreClassrooms)
                 {
                     groupSubject.Subject.NoClassroom = true;
-                    groupSubject.Subject.ClassroomTypes.Clear();    
+                    groupSubject.Subject.ClassroomTypes.Clear();
                 }
             }
         }
@@ -95,26 +95,37 @@ namespace AcaTime.ScheduleCommon.Services
         /// <param name="ignoreClassrooms"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<List<long>> DoAll(long facultySeasonId, Dictionary<string, string> parameters, IScheduleAlgorithm scheduleAlgorithm, bool ignoreClassrooms = false, CancellationToken cancellationToken = default)
+        public async Task<List<long>> DoAll(
+            FacultySeasonDTO root,
+            UserFunctions userFunctions,
+            IScheduleAlgorithm scheduleAlgorithm,
+            Dictionary<string, string> parameters,
+            bool ignoreClassrooms = false,
+            CancellationToken cancellationToken = default)
         {
+            if (root == null)
+                throw new ArgumentNullException(nameof(root));
+
+            long facultySeasonId = root.Id;
+
             var dd = new DebugData("schedule", true);
             List<AlgorithmResultDTO> resultDTOs = new List<AlgorithmResultDTO>();
             var res = new List<long>();
 
             try
             {
-                var (root, userFunctions) = await Load(facultySeasonId);
+                GenerateScheduleSlots(root);
                 ChecAndPatchkData(root, ignoreClassrooms);
                 dd.Step("load");
                 resultDTOs = await scheduleAlgorithm.Run(root, userFunctions, parameters, logger, cancellationToken);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in schedule algorithm");
+                logger.LogError(ex, "Помилка при генерації розкладу");
                 res.Add(await dataService.SaveError(facultySeasonId, scheduleAlgorithm.GetName(), ex.Message));
 
             }
-            
+
             dd.Step("calculate");
 
             if (resultDTOs != null && resultDTOs.Count > 0)
@@ -134,7 +145,9 @@ namespace AcaTime.ScheduleCommon.Services
 
             dd.Step("save");
 
-            logger.LogInformation($"Schedule saved: {res.Count}");
+            if (resultDTOs != null && resultDTOs.Count > 0)
+                logger.LogInformation($"Збережено {res.Count} варіантів розкладу");
+                
             logger.LogDebug(dd.ToString());
 
             return res;

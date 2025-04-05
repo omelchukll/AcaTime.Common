@@ -15,8 +15,12 @@ namespace AcaTime.ScheduleCommon.Models.Api
         public SimplifiedSubjectDTO Subject { get; set; }
 
         /// <summary>Список груп та підгруп.</summary>
-        public List<SimplifiedStudentGroupDTO> Groups { get; set; } = new List<SimplifiedStudentGroupDTO>();
+        public List<SimplifiedStudentLessonGroupDTO> Groups { get; set; } = new List<SimplifiedStudentLessonGroupDTO>();
 
-     
+       /// <summary>
+        /// Кількість студентів в групі
+        /// </summary>
+        public int StudentCount { get; set; }
+
     }
 } 

@@ -14,11 +14,8 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         private IReadOnlyList<IScheduleSlot> _slots;
         private readonly object _slotsLock = new();
 
-        private readonly Dictionary<long, IReadOnlyList<IScheduleSlot>> _teacherCache = new();
-        private readonly object _teacherLock = new();
-
-        private readonly Dictionary<long, IReadOnlyList<IScheduleSlot>> _groupCache = new();
-        private readonly object _groupLock = new();
+        private readonly Func<long, DateTime, IEnumerable<IScheduleSlot>> _teacherAndDateSlotFactory;
+        private readonly Func<long, DateTime, IEnumerable<IScheduleSlot>> _groupAndDateSlotFactory;
 
         /// <summary>
         /// Конструктор з підтримкою фабрик для відкладеного обчислення.
@@ -26,11 +23,15 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         public AssignedSlotsDTO(
             Func<IEnumerable<IScheduleSlot>> slotFactory,
             Func<long, IEnumerable<IScheduleSlot>> slotsByTeacherFactory,
-            Func<long, IEnumerable<IScheduleSlot>> slotsByGroupFactory)
+            Func<long, IEnumerable<IScheduleSlot>> slotsByGroupFactory,
+            Func<long, DateTime, IEnumerable<IScheduleSlot>> slotsByTeacherAndDateFactory,
+            Func<long, DateTime, IEnumerable<IScheduleSlot>> slotsByGroupAndDateFactory)
         {
             _slotFactory = slotFactory;
             _teacherSlotFactory = slotsByTeacherFactory;
             _groupSlotFactory = slotsByGroupFactory;
+            _teacherAndDateSlotFactory = slotsByTeacherAndDateFactory;
+            _groupAndDateSlotFactory = slotsByGroupAndDateFactory;
         }
 
         /// <summary>
@@ -60,15 +61,7 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// </summary>
         public IReadOnlyList<IScheduleSlot> GetSlotsByTeacher(long teacherId)
         {
-            lock (_teacherLock)
-            {
-                if (_teacherCache.TryGetValue(teacherId, out var result))
-                    return result;
-
-                result = _teacherSlotFactory(teacherId).ToList();
-                _teacherCache[teacherId] = result;
-                return result;
-            }
+            return _teacherSlotFactory(teacherId).ToList();
         }
 
         /// <summary>
@@ -76,15 +69,23 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// </summary>
         public IReadOnlyList<IScheduleSlot> GetSlotsByGroup(long groupId)
         {
-            lock (_groupLock)
-            {
-                if (_groupCache.TryGetValue(groupId, out var result))
-                    return result;
+            return _groupSlotFactory(groupId).ToList();
+        }
 
-                result = _groupSlotFactory(groupId).ToList();
-                _groupCache[groupId] = result;
-                return result;
-            }
+        /// <summary>
+        /// Призначені слоти для конкретного викладача та дати (потокобезпечне кешування).
+        /// </summary>
+        public IReadOnlyList<IScheduleSlot> GetSlotsByTeacherAndDate(long teacherId, DateTime date)
+        {
+            return _teacherAndDateSlotFactory(teacherId, date).ToList();    
+        }
+
+        /// <summary>
+        /// Призначені слоти для конкретної групи та дати (потокобезпечне кешування).
+        /// </summary>
+        public IReadOnlyList<IScheduleSlot> GetSlotsByGroupAndDate(long groupId, DateTime date)
+        {
+            return _groupAndDateSlotFactory(groupId, date).ToList();
         }
     }
 

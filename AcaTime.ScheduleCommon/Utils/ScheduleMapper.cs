@@ -30,7 +30,8 @@ namespace AcaTime.ScheduleCommon.Utils
                 BeginSeason = facultySeasonData.BeginSeason,
                 EndSeason = facultySeasonData.EndSeason,
                 MaxLessonsPerDay = facultySeasonData.MaxLessonsPerDay,
-                GroupSubjects = facultySeasonData.GroupSubjects?.Select(gs => ToSimplifiedDto(gs)).ToList() ?? new List<SimplifiedGroupSubjectDTO>()
+                GroupSubjects = facultySeasonData.GroupSubjects?.Select(gs => ToSimplifiedDto(gs)).ToList() ?? new List<SimplifiedGroupSubjectDTO>(),
+                Classrooms = facultySeasonData.Classrooms?.Select(c => ToSimplifiedDto(c)).ToList() ?? new List<SimplifiedClassroomDTO>()
             };
         }
 
@@ -47,11 +48,39 @@ namespace AcaTime.ScheduleCommon.Utils
             return new SimplifiedGroupSubjectDTO
             {
                 Id = groupSubject.Id,
+                StudentCount = groupSubject.StudentCount,
                 Teacher = ToSimplifiedDto(groupSubject.Teacher),
                 Subject = ToSimplifiedDto(groupSubject.Subject),
-                Groups = groupSubject.Groups?.Select(g => ToSimplifiedDto(g)).ToList() ?? new List<SimplifiedStudentGroupDTO>()
+                Groups = groupSubject.Groups?.Select(g => ToSimplifiedDto(g)).ToList() ?? new List<SimplifiedStudentLessonGroupDTO>()
             };
         }
+
+        /// <summary>
+        /// Конвертує Classroom у спрощений SimplifiedClassroomDTO
+        /// </summary>
+        /// <param name="classroom">Дані про аудиторію</param>
+        /// <returns>Спрощений DTO об'єкт для аудиторії</returns>
+        public static SimplifiedClassroomDTO ToSimplifiedDto(ClassroomDTO classroom)
+        {
+            if (classroom == null)
+                return null;
+
+            return new SimplifiedClassroomDTO
+            {
+                Id = classroom.Id,
+                Name = classroom.Name,
+                StudentCount = classroom.StudentCount,
+                ClassroomTypes = classroom.ClassroomTypes.Select(c => new SimplifiedSelectedClassroomTypeDTO
+                {
+                    ClassroomTypeId = c.ClassroomTypeId,
+                    ClassroomTypeName = c.ClassroomTypeName,
+                    Priority = c.Priority
+
+                }).ToList()
+            };
+        }
+
+
 
         /// <summary>
         /// Конвертує Teacher у спрощений SimplifiedTeacherDTO
@@ -91,6 +120,12 @@ namespace AcaTime.ScheduleCommon.Utils
                 SubjectTypeId = subject.SubjectTypeId,
                 SubjectTypeName = subject.SubjectTypeName,
                 SubjectTypeShortName = subject.SubjectTypeShortName,
+                NoClassroom = subject.NoClassroom,
+                ClassroomTypes = subject.ClassroomTypes.Select(s => new SimplifiedSelectedClassroomTypeDTO{ 
+                  Priority = s.Priority,
+                  ClassroomTypeName = s.ClassroomTypeName,
+                  ClassroomTypeId = s.ClassroomTypeId
+                }).ToList(),
                 DefinedSeries = subject.DefinedSeries?.Select(s => new SimplifiedSubjectSeriesDTO
                 {
                     NumberOfLessons = s.NumberOfLessons,
@@ -106,12 +141,12 @@ namespace AcaTime.ScheduleCommon.Utils
         /// </summary>
         /// <param name="group">Дані про групу студентів</param>
         /// <returns>Спрощений DTO об'єкт для групи студентів</returns>
-        public static SimplifiedStudentGroupDTO ToSimplifiedDto(StudentLessonGroupDTO group)
+        public static SimplifiedStudentLessonGroupDTO ToSimplifiedDto(StudentLessonGroupDTO group)
         {
             if (group == null)
                 return null;
 
-            return new SimplifiedStudentGroupDTO
+            return new SimplifiedStudentLessonGroupDTO
             {
                 Id = group.Id,
                 Name = group.Name,
@@ -178,15 +213,20 @@ namespace AcaTime.ScheduleCommon.Utils
             if (simplifiedSlot == null)
                 return null;
 
-            return new ScheduleSlotDTO
+            var res = new ScheduleSlotDTO
             {
                 Id = simplifiedSlot.Id,
                 LessonNumber = simplifiedSlot.LessonNumber,
                 Date = simplifiedSlot.Date,
                 PairNumber = simplifiedSlot.PairNumber,
-                LessonSeriesLength = simplifiedSlot.LessonSeriesLength,
+                LessonSeriesLength = simplifiedSlot.LessonSeriesLength,               
                 GroupSubject = new GroupSubjectDTO { Id = simplifiedSlot.GroupSubjectId }
             };
+
+            if (simplifiedSlot.ClassroomId.HasValue)
+                res.Classroom = new ClassroomDTO { Id = simplifiedSlot.ClassroomId.Value };
+
+            return res;
         }
 
         /// <summary>
@@ -208,9 +248,9 @@ namespace AcaTime.ScheduleCommon.Utils
         /// <param name="facultySeason">Дані семестру факультету</param>
         /// <param name="userFunctions">Користувацькі функції</param>
         /// <returns>DTO з даними розкладу</returns>
-        public static ScheduleDataDto CreateScheduleDataDto(FacultySeasonDTO facultySeason, UserFunctions userFunctions)
+        public static SimplifiedScheduleDataDto CreateScheduleDataDto(FacultySeasonDTO facultySeason, UserFunctions userFunctions)
         {
-            return new ScheduleDataDto
+            return new SimplifiedScheduleDataDto
             {
                 FacultySeason = ToSimplifiedDto(facultySeason),
                 UserFunctions = ToSimplifiedDto(userFunctions)

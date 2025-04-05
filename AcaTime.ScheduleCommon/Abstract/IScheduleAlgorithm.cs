@@ -2,7 +2,7 @@
 using AcaTime.ScheduleCommon.Models.Constraints;
 using Microsoft.Extensions.Logging;
 
-namespace AcaTime.ScheduleCommon.Interfaces
+namespace AcaTime.ScheduleCommon.Abstract
 {
     /// <summary>
     /// Алгоритм розподілу розкладу

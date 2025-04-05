@@ -26,5 +26,11 @@ namespace AcaTime.ScheduleCommon.Models.Api
         /// Кількість уроків для предмета в один і той же день тижня і той же номер пари
         /// </summary>
         public int LessonSeriesLength { get; set; } = 1;
+
+
+        /// <summary>   
+        /// Ідентифікатор аудиторії для заняття
+        /// </summary>
+        public long? ClassroomId { get; set; }
     }
 } 

@@ -48,6 +48,15 @@ namespace AcaTime.ScheduleCommon.Utils
                 }
             }
 
+            if (simplifiedFacultySeason.Classrooms != null)
+            {
+                foreach (var simplifiedClassroom in simplifiedFacultySeason.Classrooms)
+                {
+                    var classroom = FromSimplifiedDto(simplifiedClassroom);
+                    facultySeason.Classrooms.Add(classroom);
+                }
+            }
+
             return facultySeason;
         }
 
@@ -66,8 +75,34 @@ namespace AcaTime.ScheduleCommon.Utils
                 Id = simplifiedGs.Id,
                 Teacher = FromSimplifiedDto(simplifiedGs.Teacher),
                 Subject = FromSimplifiedDto(simplifiedGs.Subject),
+                StudentCount = simplifiedGs.StudentCount,
                 Groups = simplifiedGs.Groups?.Select(g => FromSimplifiedDto(g)).ToList() ?? new List<StudentLessonGroupDTO>(),
                 ScheduleSlots = new List<ScheduleSlotDTO>()
+            };
+        }
+
+
+        /// <summary>
+        /// Конвертує спрощену модель аудиторії в повну модель для алгоритму
+        /// </summary>
+        /// <param name="simplifiedClassroom">Спрощений DTO об'єкт для аудиторії</param>
+        /// <returns>Повна модель даних аудиторії для алгоритму</returns>
+        public static ClassroomDTO FromSimplifiedDto(SimplifiedClassroomDTO simplifiedClassroom)
+        {
+            if (simplifiedClassroom == null)
+                return null;
+
+            return new ClassroomDTO
+            {
+                Id = simplifiedClassroom.Id,
+                Name = simplifiedClassroom.Name,
+                StudentCount = simplifiedClassroom.StudentCount,
+                ClassroomTypes = simplifiedClassroom.ClassroomTypes.Select(c => new SelectedClassroomTypeDTO
+                {
+                    ClassroomTypeId = c.ClassroomTypeId,
+                    ClassroomTypeName = c.ClassroomTypeName,
+                    Priority = c.Priority
+                }).ToList()
             };
         }
 
@@ -109,12 +144,19 @@ namespace AcaTime.ScheduleCommon.Utils
                 SubjectTypeId = simplifiedSubject.SubjectTypeId,
                 SubjectTypeName = simplifiedSubject.SubjectTypeName,
                 SubjectTypeShortName = simplifiedSubject.SubjectTypeShortName,
+                NoClassroom = simplifiedSubject.NoClassroom,
+                ClassroomTypes = simplifiedSubject.ClassroomTypes.Select(s => new SelectedClassroomTypeDTO
+                {
+                    ClassroomTypeId = s.ClassroomTypeId,
+                    ClassroomTypeName = s.ClassroomTypeName,
+                    Priority = s.Priority
+                }).ToList(),
                 DefinedSeries = simplifiedSubject.DefinedSeries?.Select(s => new SubjectSeriesDto
                 {
                     NumberOfLessons = s.NumberOfLessons,
                     SeriesNumber = s.SeriesNumber,
                     SplitType = (SubjectSeriesSplitType)s.SplitType,
-                    StartInAnyWeek = s.StartInAnyWeek   
+                    StartInAnyWeek = s.StartInAnyWeek
                 }).ToList() ?? new List<SubjectSeriesDto>()
             };
         }
@@ -124,7 +166,7 @@ namespace AcaTime.ScheduleCommon.Utils
         /// </summary>
         /// <param name="simplifiedGroup">Спрощений DTO об'єкт для групи студентів</param>
         /// <returns>Повна модель даних групи студентів для алгоритму</returns>
-        public static StudentLessonGroupDTO FromSimplifiedDto(SimplifiedStudentGroupDTO simplifiedGroup)
+        public static StudentLessonGroupDTO FromSimplifiedDto(SimplifiedStudentLessonGroupDTO simplifiedGroup)
         {
             if (simplifiedGroup == null)
                 return null;
@@ -255,45 +297,14 @@ namespace AcaTime.ScheduleCommon.Utils
             };
         }
 
-        /// <summary>
-        /// Генерує слоти розкладу для кожного групового предмету
-        /// </summary>
-        /// <param name="facultySeason">Дані семестру факультету</param>
-        public static void GenerateScheduleSlots(FacultySeasonDTO facultySeason)
-        {
-            if (facultySeason == null || facultySeason.GroupSubjects == null)
-                return;
 
-            foreach (var groupSubject in facultySeason.GroupSubjects)
-            {
-                if (groupSubject.Subject == null) 
-                    continue;
-
-                // Очищаємо поточні слоти, якщо вони були
-                groupSubject.ScheduleSlots.Clear();
-
-                // Створюємо нові слоти відповідно до кількості уроків
-                for (int i = 0; i < groupSubject.Subject.NumberOfLessons; i++)
-                {
-                    groupSubject.ScheduleSlots.Add(new ScheduleSlotDTO
-                    {
-                        Id = 0, // Тимчасовий ID
-                        LessonNumber = i + 1,
-                        PairNumber = 0, // Буде визначено пізніше
-                        Date = DateTime.MinValue, // Буде визначено алгоритмом
-                        GroupSubject = groupSubject,
-                        LessonSeriesLength = 1 // За замовчуванням 1 урок
-                    });
-                }
-            }
-        }
 
         /// <summary>
         /// Створює дані для запуску алгоритму розкладу на основі DTO, отриманого з API без компіляції скриптів
         /// </summary>
         /// <param name="scheduleData">DTO з даними розкладу</param>
         /// <returns>Кортеж з моделлю семестру і функціями користувача для алгоритму</returns>
-        public static (FacultySeasonDTO facultySeason, UserFunctions userFunctions) CreateScheduleAlgorithmData(ScheduleDataDto scheduleData)
+        public static ScheduleDataDto CreateScheduleAlgorithmData(SimplifiedScheduleDataDto scheduleData)
         {
             if (scheduleData == null)
                 throw new ArgumentNullException(nameof(scheduleData));
@@ -301,118 +312,55 @@ namespace AcaTime.ScheduleCommon.Utils
             var facultySeason = FromSimplifiedDto(scheduleData.FacultySeason);
             var userFunctions = FromSimplifiedDto(scheduleData.UserFunctions);
 
-            // Генеруємо слоти для всіх групових предметів
-            GenerateScheduleSlots(facultySeason);
+            return new ScheduleDataDto
+            {
+                FacultySeason = facultySeason,
+                UserFunctions = userFunctions
+            };
+        }
 
-            return (facultySeason, userFunctions);
+        /// <summary>
+        /// Конвертує модель слоту розкладу в спрощену модель
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public static SimplifiedScheduleSlotDTO ToSimplifiedScheduleSlotDto(ScheduleSlotDTO slot)
+        {
+            if (slot == null)
+                return null;
+
+            return new SimplifiedScheduleSlotDTO
+            {
+                Id = slot.Id,
+                LessonNumber = slot.LessonNumber,
+                Date = slot.Date,
+                PairNumber = slot.PairNumber,
+                LessonSeriesLength = slot.LessonSeriesLength,
+                GroupSubjectId = slot.GroupSubject.Id,
+                ClassroomId = slot.Classroom?.Id
+            };
+        }
+
+        /// <summary>
+        /// Конвертує список слотів розкладу в спрощену модель
+        /// </summary>
+        /// <param name="slots"></param>
+        /// <returns></returns>
+        public static List<SimplifiedScheduleSlotDTO> ToSimplifiedScheduleSlotDtos(IEnumerable<ScheduleSlotDTO> slots)
+        {
+            if (slots == null)
+                return new List<SimplifiedScheduleSlotDTO>();
+
+            return slots.Select(slot => ToSimplifiedScheduleSlotDto(slot)).ToList();
         }
 
         #endregion
 
         #region Компіляція скриптів
 
-        /// <summary>
-        /// Створює дані для запуску алгоритму розкладу на основі DTO з компіляцією скриптів
-        /// </summary>
-        /// <param name="scheduleData">DTO з даними розкладу</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Кортеж з моделлю семестру і функціями користувача для алгоритму</returns>
-        public static async Task<(FacultySeasonDTO facultySeason, UserFunctions userFunctions)> CreateScheduleAlgorithmDataWithScripts(
-            ScheduleDataDto scheduleData, 
-            ScriptExecutionService scriptService)
-        {
-            if (scheduleData == null)
-                throw new ArgumentNullException(nameof(scheduleData));
-            
-            if (scriptService == null)
-                throw new ArgumentNullException(nameof(scriptService));
 
-            var facultySeason = FromSimplifiedDto(scheduleData.FacultySeason);
-            var userFunctions = await FromSimplifiedDtoWithScripts(scheduleData.UserFunctions, scriptService);
 
-            // Генеруємо слоти для всіх групових предметів
-            GenerateScheduleSlots(facultySeason);
 
-            return (facultySeason, userFunctions);
-        }
-
-        /// <summary>
-        /// Конвертує спрощений DTO для функцій користувача в повну модель для алгоритму з компіляцією скриптів
-        /// </summary>
-        /// <param name="simplifiedUserFunctions">Спрощений DTO з функціями користувача</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Повна модель з функціями користувача для алгоритму</returns>
-        public static async Task<UserFunctions> FromSimplifiedDtoWithScripts(
-            SimplifiedUserFunctionsDTO simplifiedUserFunctions, 
-            ScriptExecutionService scriptService)
-        {
-            if (simplifiedUserFunctions == null)
-                return null;
-
-            if (scriptService == null)
-                throw new ArgumentNullException(nameof(scriptService));
-
-            var userFunctions = new UserFunctions
-            {
-                ScheduleEstimations = new List<ScheduleEstimation>(),
-                ScheduleSlotEstimations = new List<ScheduleSlotEstimation>(),
-                UnitaryConstraints = new List<UnitaryConstraint>(),
-                SlotPriorities = new List<SlotPriorityEstimation>(),
-                SlotValidators = new List<ScheduleSlotValidation>()
-            };
-
-            // Компіляція скриптів для ScheduleEstimations
-            if (simplifiedUserFunctions.ScheduleEstimations != null)
-            {
-                foreach (var constraint in simplifiedUserFunctions.ScheduleEstimations)
-                {
-                    var estimation = await CreateScheduleEstimationWithScript(constraint, scriptService);
-                    userFunctions.ScheduleEstimations.Add(estimation);
-                }
-            }
-
-            // Компіляція скриптів для ScheduleSlotEstimations
-            if (simplifiedUserFunctions.ScheduleSlotEstimations != null)
-            {
-                foreach (var constraint in simplifiedUserFunctions.ScheduleSlotEstimations)
-                {
-                    var estimation = await CreateScheduleSlotEstimationWithScript(constraint, scriptService);
-                    userFunctions.ScheduleSlotEstimations.Add(estimation);
-                }
-            }
-
-            // Компіляція скриптів для UnitaryConstraints
-            if (simplifiedUserFunctions.UnitaryConstraints != null)
-            {
-                foreach (var constraint in simplifiedUserFunctions.UnitaryConstraints)
-                {
-                    var unitaryConstraint = await CreateUnitaryConstraintWithScript(constraint, scriptService);
-                    userFunctions.UnitaryConstraints.Add(unitaryConstraint);
-                }
-            }
-
-            // Компіляція скриптів для SlotPriorities
-            if (simplifiedUserFunctions.SlotPriorities != null)
-            {
-                foreach (var constraint in simplifiedUserFunctions.SlotPriorities)
-                {
-                    var priority = await CreateSlotPriorityEstimationWithScript(constraint, scriptService);
-                    userFunctions.SlotPriorities.Add(priority);
-                }
-            }
-
-            // Компіляція скриптів для SlotValidators
-            if (simplifiedUserFunctions.SlotValidators != null)
-            {
-                foreach (var constraint in simplifiedUserFunctions.SlotValidators)
-                {
-                    var validator = await CreateScheduleSlotValidationWithScript(constraint, scriptService);
-                    userFunctions.SlotValidators.Add(validator);
-                }
-            }
-
-            return userFunctions;
-        }
 
         /// <summary>
         /// Створює об'єкт обмеження ScheduleEstimation з скомпільованим скриптом
@@ -421,7 +369,7 @@ namespace AcaTime.ScheduleCommon.Utils
         /// <param name="scriptService">Сервіс для компіляції скриптів</param>
         /// <returns>Завдання, що повертає об'єкт обмеження для оцінки розкладу</returns>
         public static async Task<ScheduleEstimation> CreateScheduleEstimationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint, 
+            SimplifiedConstraintDTO simplifiedConstraint,
             ScriptExecutionService scriptService)
         {
             var estimation = CreateScheduleEstimation(simplifiedConstraint);
@@ -436,7 +384,7 @@ namespace AcaTime.ScheduleCommon.Utils
         /// <param name="scriptService">Сервіс для компіляції скриптів</param>
         /// <returns>Завдання, що повертає об'єкт обмеження для оцінки слоту розкладу</returns>
         public static async Task<ScheduleSlotEstimation> CreateScheduleSlotEstimationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint, 
+            SimplifiedConstraintDTO simplifiedConstraint,
             ScriptExecutionService scriptService)
         {
             var estimation = CreateScheduleSlotEstimation(simplifiedConstraint);
@@ -451,7 +399,7 @@ namespace AcaTime.ScheduleCommon.Utils
         /// <param name="scriptService">Сервіс для компіляції скриптів</param>
         /// <returns>Завдання, що повертає об'єкт унітарного обмеження</returns>
         public static async Task<UnitaryConstraint> CreateUnitaryConstraintWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint, 
+            SimplifiedConstraintDTO simplifiedConstraint,
             ScriptExecutionService scriptService)
         {
             var constraint = CreateUnitaryConstraint(simplifiedConstraint);
@@ -467,7 +415,7 @@ namespace AcaTime.ScheduleCommon.Utils
         /// <param name="scriptService">Сервіс для компіляції скриптів</param>
         /// <returns>Завдання, що повертає об'єкт обмеження для оцінки пріоритету слоту</returns>
         public static async Task<SlotPriorityEstimation> CreateSlotPriorityEstimationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint, 
+            SimplifiedConstraintDTO simplifiedConstraint,
             ScriptExecutionService scriptService)
         {
             var priority = CreateSlotPriorityEstimation(simplifiedConstraint);
@@ -482,7 +430,7 @@ namespace AcaTime.ScheduleCommon.Utils
         /// <param name="scriptService">Сервіс для компіляції скриптів</param>
         /// <returns>Завдання, що повертає об'єкт обмеження для валідації слоту</returns>
         public static async Task<ScheduleSlotValidation> CreateScheduleSlotValidationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint, 
+            SimplifiedConstraintDTO simplifiedConstraint,
             ScriptExecutionService scriptService)
         {
             var validator = CreateScheduleSlotValidation(simplifiedConstraint);
@@ -490,111 +438,8 @@ namespace AcaTime.ScheduleCommon.Utils
             return validator;
         }
 
-        /// <summary>
-        /// Створює дані для запуску алгоритму розкладу на основі DTO з компіляцією скриптів паралельно для кращої продуктивності
-        /// </summary>
-        /// <param name="scheduleData">DTO з даними розкладу</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Кортеж з моделлю семестру і функціями користувача для алгоритму</returns>
-        public static async Task<(FacultySeasonDTO facultySeason, UserFunctions userFunctions)> CreateScheduleAlgorithmDataWithScriptsParallel(
-            ScheduleDataDto scheduleData, 
-            ScriptExecutionService scriptService)
-        {
-            if (scheduleData == null)
-                throw new ArgumentNullException(nameof(scheduleData));
-            
-            if (scriptService == null)
-                throw new ArgumentNullException(nameof(scriptService));
 
-            var facultySeason = FromSimplifiedDto(scheduleData.FacultySeason);
-
-            // Генеруємо слоти для всіх групових предметів (не залежить від компіляції скриптів)
-            GenerateScheduleSlots(facultySeason);
-
-            if (scheduleData.UserFunctions == null)
-                return (facultySeason, new UserFunctions());
-
-            var userFunctions = new UserFunctions();
-
-            // Створюємо задачі для паралельної компіляції різних типів обмежень
-            var compilationTasks = new List<Task>();
-
-            // ScheduleEstimations
-            if (scheduleData.UserFunctions.ScheduleEstimations != null && scheduleData.UserFunctions.ScheduleEstimations.Any())
-            {
-                var scheduleTasks = scheduleData.UserFunctions.ScheduleEstimations.Select(async constraint => 
-                {
-                    var estimation = await CreateScheduleEstimationWithScript(constraint, scriptService);
-                    lock (userFunctions.ScheduleEstimations)
-                    {
-                        userFunctions.ScheduleEstimations.Add(estimation);
-                    }
-                });
-                compilationTasks.AddRange(scheduleTasks);
-            }
-
-            // ScheduleSlotEstimations
-            if (scheduleData.UserFunctions.ScheduleSlotEstimations != null && scheduleData.UserFunctions.ScheduleSlotEstimations.Any())
-            {
-                var slotEstimationTasks = scheduleData.UserFunctions.ScheduleSlotEstimations.Select(async constraint => 
-                {
-                    var estimation = await CreateScheduleSlotEstimationWithScript(constraint, scriptService);
-                    lock (userFunctions.ScheduleSlotEstimations)
-                    {
-                        userFunctions.ScheduleSlotEstimations.Add(estimation);
-                    }
-                });
-                compilationTasks.AddRange(slotEstimationTasks);
-            }
-
-            // UnitaryConstraints
-            if (scheduleData.UserFunctions.UnitaryConstraints != null && scheduleData.UserFunctions.UnitaryConstraints.Any())
-            {
-                var unitaryTasks = scheduleData.UserFunctions.UnitaryConstraints.Select(async constraint => 
-                {
-                    var unitaryConstraint = await CreateUnitaryConstraintWithScript(constraint, scriptService);
-                    lock (userFunctions.UnitaryConstraints)
-                    {
-                        userFunctions.UnitaryConstraints.Add(unitaryConstraint);
-                    }
-                });
-                compilationTasks.AddRange(unitaryTasks);
-            }
-
-            // SlotPriorities
-            if (scheduleData.UserFunctions.SlotPriorities != null && scheduleData.UserFunctions.SlotPriorities.Any())
-            {
-                var priorityTasks = scheduleData.UserFunctions.SlotPriorities.Select(async constraint => 
-                {
-                    var priority = await CreateSlotPriorityEstimationWithScript(constraint, scriptService);
-                    lock (userFunctions.SlotPriorities)
-                    {
-                        userFunctions.SlotPriorities.Add(priority);
-                    }
-                });
-                compilationTasks.AddRange(priorityTasks);
-            }
-
-            // SlotValidators
-            if (scheduleData.UserFunctions.SlotValidators != null && scheduleData.UserFunctions.SlotValidators.Any())
-            {
-                var validatorTasks = scheduleData.UserFunctions.SlotValidators.Select(async constraint => 
-                {
-                    var validator = await CreateScheduleSlotValidationWithScript(constraint, scriptService);
-                    lock (userFunctions.SlotValidators)
-                    {
-                        userFunctions.SlotValidators.Add(validator);
-                    }
-                });
-                compilationTasks.AddRange(validatorTasks);
-            }
-
-            // Очікуємо завершення всіх задач компіляції
-            await Task.WhenAll(compilationTasks);
-
-            return (facultySeason, userFunctions);
-        }
 
         #endregion
     }
-} 
+}

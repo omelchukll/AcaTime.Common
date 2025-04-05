@@ -1,3 +1,5 @@
+using AcaTime.ScheduleCommon.Models.Calc;
+
 namespace AcaTime.ScheduleCommon.Models.Api
 {
     /// <summary>
@@ -22,5 +24,8 @@ namespace AcaTime.ScheduleCommon.Models.Api
 
         /// <summary>Список предметів, закріплених за групами.</summary>
         public List<SimplifiedGroupSubjectDTO> GroupSubjects { get; set; } = new List<SimplifiedGroupSubjectDTO>();
+
+        /// <summary>Список аудиторій.</summary>
+        public List<SimplifiedClassroomDTO> Classrooms { get; set; } = new List<SimplifiedClassroomDTO>();
     }
 } 

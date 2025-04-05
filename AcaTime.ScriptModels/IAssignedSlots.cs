@@ -21,5 +21,15 @@ namespace AcaTime.ScriptModels
         /// Отримати призначені слоти за групою по ID
         /// </summary>
         IReadOnlyList<IScheduleSlot> GetSlotsByGroup(long groupId);
+
+        /// <summary>
+        /// Отримати призначені слоти за датою та викладачем по ID
+        /// </summary>
+        IReadOnlyList<IScheduleSlot> GetSlotsByTeacherAndDate(long teacherId, DateTime date);
+
+        /// <summary>
+        /// Отримати призначені слоти за датою та групою по ID
+        /// </summary>
+        IReadOnlyList<IScheduleSlot> GetSlotsByGroupAndDate(long groupId, DateTime date);
     }
 }

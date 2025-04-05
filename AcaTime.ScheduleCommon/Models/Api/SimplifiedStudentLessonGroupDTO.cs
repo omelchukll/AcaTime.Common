@@ -3,7 +3,7 @@ namespace AcaTime.ScheduleCommon.Models.Api
     /// <summary>
     /// Спрощена версія DTO групи студентів
     /// </summary>
-    public class SimplifiedStudentGroupDTO
+    public class SimplifiedStudentLessonGroupDTO
     {
         /// <summary>Ідентифікатор групи.</summary>
         public long Id { get; set; }
