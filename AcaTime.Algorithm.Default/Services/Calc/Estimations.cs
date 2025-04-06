@@ -90,7 +90,7 @@ namespace AcaTime.Algorithm.Default.Services.Calc
         /// </summary>
         /// <param name="slot"></param>
         /// <returns></returns>
-        public static int DefaultSlotEstimation(SlotEstimationDTO slot)
+        public static int DefaultSlotEstimation(ISlotEstimation slot)
         {
             int res = slot.AvailableDomains * -10 + slot.LessonSeriesLength * 2 + slot.GroupCount;
 

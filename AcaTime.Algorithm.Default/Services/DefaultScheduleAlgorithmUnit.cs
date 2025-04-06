@@ -37,13 +37,18 @@ namespace AcaTime.Algorithm.Default.Services
         // для заміру часа виконання
         public DebugData DebugData { get; set; } = new DebugData("none");
 
-        // додатковий кеш для прискорення деякіх функцій
+        // додатковий кеш для прискорення деякіх функцій, клонується в Clone
         internal Dictionary<long, List<SlotTracker>> teacherSlots;
         internal Dictionary<long, List<SlotTracker>> groupsSlots;
         internal List<SlotTracker> FirstTrackers;
+
+        // приватний кеш
         private Dictionary<int, List<SlotTracker>> slotsByStep = new Dictionary<int, List<SlotTracker>>(); // для зберігання слотів по крокам
         private Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>> assignedSlotsByTeacherDate = new Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>>();
         private Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>> assignedSlotsByGroupDate = new Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>>();
+        private HashSet<SlotTracker> unassignedFirstSlots;
+        private Dictionary<long, List<SlotTracker>> firstSlotsByGroupSubjects;
+
 
         /// <summary>
         /// Налаштування алгоритму
@@ -60,6 +65,18 @@ namespace AcaTime.Algorithm.Default.Services
             Parameters = parameters;
         }
 
+        private void PreparePrivateCash() 
+        {
+            firstSlotsByGroupSubjects = FirstTrackers
+                .Where(x => !x.IsAssigned && x.IsFirstTrackerInSeries)
+                .GroupBy(s => s.ScheduleSlot.GroupSubject.Id)
+            .ToDictionary(g => g.Key, g => g.OrderBy(s => s.SeriesId).ToList());
+
+            unassignedFirstSlots = firstSlotsByGroupSubjects.Values.Select(x => x.First())
+                .ToHashSet();
+        }
+
+
         #region Основні функції алгоритму
 
         /// <summary>
@@ -71,6 +88,8 @@ namespace AcaTime.Algorithm.Default.Services
         {
             cancelToken = token;
             DebugData = new DebugData(algorithmName, true);
+
+            PreparePrivateCash();
 
             bool success = false;
 
@@ -127,7 +146,8 @@ namespace AcaTime.Algorithm.Default.Services
             DebugData.Step("start");
 
             // Отримуємо наступний незаповнений слот із застосуванням MRV та пріоритету для лекцій.
-            SlotTracker nextSlot = GetNextUnassignedSlot();
+            SlotTracker? nextSlot = GetNextUnassignedSlot();            
+
             if (nextSlot == null)
             {
                 // Якщо всі слоти вже заповнені – повертаємо успіх.
@@ -137,13 +157,18 @@ namespace AcaTime.Algorithm.Default.Services
                 }
                 DebugData.Step("check result");
                 return false;
-            }
+            }          
+
             DebugData.Step("next slot");
 
             var assignedSLots = GetAssignedSlots();
 
             List<DomainValue> candidateDomains = GetSortedDomains(nextSlot, assignedSLots);
             DebugData.Step("candidateDomains");
+
+
+            // оновлення кешу для перших слотів
+            ResetUnAssignedFirstSlots(nextSlot);
 
             foreach (var domain in candidateDomains)
             {
@@ -201,6 +226,9 @@ namespace AcaTime.Algorithm.Default.Services
                     slotsByStep[currentStep].Clear();
                 }
             }
+
+            // Відновлюємо кеш для перших слотів.
+            RestoreUnAssignedFirstSlots(nextSlot);
 
             // Якщо жодне доменне значення не підходить, повертаємо false.
             DebugData.Step("end");
@@ -262,12 +290,9 @@ namespace AcaTime.Algorithm.Default.Services
         /// Вибір наступного незаповненого слоту із застосуванням MRV та пріоритету для лекцій.
         /// </summary>
         /// <returns>Незаповнений слот, або null якщо таких немає.</returns>
-        private SlotTracker GetNextUnassignedSlot()
+        private SlotTracker? GetNextUnassignedSlot()
         {
-            return FirstTrackers.Where(s => !s.IsAssigned)
-            // filter by having smallest series id group by GroupSubjectId 
-            .GroupBy(s => s.ScheduleSlot.GroupSubject.Id)
-            .Select(g => g.OrderBy(s => s.SeriesId).First())
+           return unassignedFirstSlots           
             .ResortFirstK((s) => EstimateSlot(s), Parameters.SlotsTopK, Parameters.SlotsTemperature).FirstOrDefault();
         }
 
@@ -349,6 +374,7 @@ namespace AcaTime.Algorithm.Default.Services
                 GroupSubject = slot.ScheduleSlot.GroupSubject
             };
 
+
             if (UserFunctions.SlotEstimations.Any())
                 return UserFunctions.SlotEstimations.Sum(x => x.Estimate(sp));
             else
@@ -393,7 +419,7 @@ namespace AcaTime.Algorithm.Default.Services
         /// <exception cref="ArgumentException"></exception>
         private int EstimateSlotValue(SlotTracker slotTracker, DomainValue domain, IAssignedSlots assignedSLots)
         {
-            if (slotTracker.IsAssigned) throw new ArgumentException("WTF!");
+            if (slotTracker.IsAssigned) throw new ArgumentException("Отакої!");
 
             slotTracker.ScheduleSlot.Date = domain.Date;
             slotTracker.ScheduleSlot.PairNumber = domain.PairNumber;
@@ -456,7 +482,7 @@ namespace AcaTime.Algorithm.Default.Services
                     assignedSlotsByGroupDate[group.Id][val.Date] = new HashSet<SlotTracker>();
 
                 assignedSlotsByGroupDate[group.Id][val.Date].Add(slot);
-            }
+            }          
         }
 
         /// <summary>
@@ -472,6 +498,37 @@ namespace AcaTime.Algorithm.Default.Services
                     assignedSlotsByGroupDate[group.Id][slot.ScheduleSlot.Date].Remove(slot);
             }
             slot.IsAssigned = false;
+        }
+
+
+        /// <summary>
+        /// Оновлення кешу перших слотів для групи.
+        /// </summary>
+        /// <param name="slot"></param>
+        private void ResetUnAssignedFirstSlots(SlotTracker slot)
+        {
+            if (slot.IsFirstTrackerInSeries)
+            {
+                unassignedFirstSlots.Remove(slot);
+                var firstUnassignedSlot = firstSlotsByGroupSubjects[slot.ScheduleSlot.GroupSubject.Id].FirstOrDefault(x => !x.IsAssigned && x!=slot);
+                if (firstUnassignedSlot != null)                
+                    unassignedFirstSlots.Add(firstUnassignedSlot);
+            }
+        }
+
+        /// <summary>
+        /// Відновлення кешу перших слотів для групи.
+        /// </summary>
+        /// <param name="slot"></param>
+        private void RestoreUnAssignedFirstSlots(SlotTracker slot)
+        {
+            if (slot.IsFirstTrackerInSeries)
+            {
+                var firstUnassignedSlot = firstSlotsByGroupSubjects[slot.ScheduleSlot.GroupSubject.Id].FirstOrDefault(x => !x.IsAssigned && x != slot);
+                if (firstUnassignedSlot != null)
+                    unassignedFirstSlots.Remove(firstUnassignedSlot);
+                unassignedFirstSlots.Add(slot);
+            }               
         }
 
         /// <summary>
