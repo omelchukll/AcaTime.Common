@@ -210,9 +210,9 @@ namespace AcaTime.ScheduleCommon.Utils
         /// </summary>
         /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
         /// <returns>Об'єкт обмеження для оцінки слоту розкладу</returns>
-        public static ScheduleSlotEstimation CreateScheduleSlotEstimation(SimplifiedConstraintDTO simplifiedConstraint)
+        public static ScheduleSlotValueEstimation CreateSlotValueEstimation(SimplifiedConstraintDTO simplifiedConstraint)
         {
-            return new ScheduleSlotEstimation
+            return new ScheduleSlotValueEstimation
             {
                 Id = simplifiedConstraint.Id,
                 Name = simplifiedConstraint.Name,
@@ -242,13 +242,13 @@ namespace AcaTime.ScheduleCommon.Utils
         }
 
         /// <summary>
-        /// Створює об'єкт обмеження SlotPriorityEstimation з спрощеного DTO без компіляції скриптів
+        /// Створює об'єкт обмеження SlotEstimation з спрощеного DTO без компіляції скриптів
         /// </summary>
         /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
         /// <returns>Об'єкт обмеження для оцінки пріоритету слоту</returns>
-        public static SlotPriorityEstimation CreateSlotPriorityEstimation(SimplifiedConstraintDTO simplifiedConstraint)
+        public static SlotEstimation CreateSlotEstimation(SimplifiedConstraintDTO simplifiedConstraint)
         {
-            return new SlotPriorityEstimation
+            return new SlotEstimation
             {
                 Id = simplifiedConstraint.Id,
                 Name = simplifiedConstraint.Name,
@@ -290,9 +290,9 @@ namespace AcaTime.ScheduleCommon.Utils
             return new UserFunctions
             {
                 ScheduleEstimations = simplifiedUserFunctions.ScheduleEstimations?.Select(CreateScheduleEstimation).ToList() ?? new List<ScheduleEstimation>(),
-                ScheduleSlotEstimations = simplifiedUserFunctions.ScheduleSlotEstimations?.Select(CreateScheduleSlotEstimation).ToList() ?? new List<ScheduleSlotEstimation>(),
+                SlotValueEstimations = simplifiedUserFunctions.ScheduleSlotEstimations?.Select(CreateSlotValueEstimation).ToList() ?? new List<ScheduleSlotValueEstimation>(),
                 UnitaryConstraints = simplifiedUserFunctions.UnitaryConstraints?.Select(CreateUnitaryConstraint).ToList() ?? new List<UnitaryConstraint>(),
-                SlotPriorities = simplifiedUserFunctions.SlotPriorities?.Select(CreateSlotPriorityEstimation).ToList() ?? new List<SlotPriorityEstimation>(),
+                SlotEstimations = simplifiedUserFunctions.SlotPriorities?.Select(CreateSlotEstimation).ToList() ?? new List<SlotEstimation>(),
                 SlotValidators = simplifiedUserFunctions.SlotValidators?.Select(CreateScheduleSlotValidation).ToList() ?? new List<ScheduleSlotValidation>()
             };
         }
@@ -356,90 +356,6 @@ namespace AcaTime.ScheduleCommon.Utils
 
         #endregion
 
-        #region Компіляція скриптів
-
-
-
-
-
-        /// <summary>
-        /// Створює об'єкт обмеження ScheduleEstimation з скомпільованим скриптом
-        /// </summary>
-        /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Завдання, що повертає об'єкт обмеження для оцінки розкладу</returns>
-        public static async Task<ScheduleEstimation> CreateScheduleEstimationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint,
-            ScriptExecutionService scriptService)
-        {
-            var estimation = CreateScheduleEstimation(simplifiedConstraint);
-            estimation.Func = await scriptService.CompileScheduleEstimationAsync(simplifiedConstraint.MainScript);
-            return estimation;
-        }
-
-        /// <summary>
-        /// Створює об'єкт обмеження ScheduleSlotEstimation з скомпільованим скриптом
-        /// </summary>
-        /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Завдання, що повертає об'єкт обмеження для оцінки слоту розкладу</returns>
-        public static async Task<ScheduleSlotEstimation> CreateScheduleSlotEstimationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint,
-            ScriptExecutionService scriptService)
-        {
-            var estimation = CreateScheduleSlotEstimation(simplifiedConstraint);
-            estimation.Func = await scriptService.CompileSlotEstimationAsync(simplifiedConstraint.MainScript);
-            return estimation;
-        }
-
-        /// <summary>
-        /// Створює об'єкт обмеження UnitaryConstraint з скомпільованим скриптом
-        /// </summary>
-        /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Завдання, що повертає об'єкт унітарного обмеження</returns>
-        public static async Task<UnitaryConstraint> CreateUnitaryConstraintWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint,
-            ScriptExecutionService scriptService)
-        {
-            var constraint = CreateUnitaryConstraint(simplifiedConstraint);
-            constraint.Func = await scriptService.CompileUnarySlotValidationAsync(simplifiedConstraint.MainScript);
-            constraint.SelectorFunc = await scriptService.CompileSlotsSelectorAsync(simplifiedConstraint.SelectorScript);
-            return constraint;
-        }
-
-        /// <summary>
-        /// Створює об'єкт обмеження SlotPriorityEstimation з скомпільованим скриптом
-        /// </summary>
-        /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Завдання, що повертає об'єкт обмеження для оцінки пріоритету слоту</returns>
-        public static async Task<SlotPriorityEstimation> CreateSlotPriorityEstimationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint,
-            ScriptExecutionService scriptService)
-        {
-            var priority = CreateSlotPriorityEstimation(simplifiedConstraint);
-            priority.Func = await scriptService.CompileSlotPriorityEstimationAsync(simplifiedConstraint.MainScript);
-            return priority;
-        }
-
-        /// <summary>
-        /// Створює об'єкт обмеження ScheduleSlotValidation з скомпільованим скриптом
-        /// </summary>
-        /// <param name="simplifiedConstraint">Спрощений DTO для обмеження</param>
-        /// <param name="scriptService">Сервіс для компіляції скриптів</param>
-        /// <returns>Завдання, що повертає об'єкт обмеження для валідації слоту</returns>
-        public static async Task<ScheduleSlotValidation> CreateScheduleSlotValidationWithScript(
-            SimplifiedConstraintDTO simplifiedConstraint,
-            ScriptExecutionService scriptService)
-        {
-            var validator = CreateScheduleSlotValidation(simplifiedConstraint);
-            validator.Func = await scriptService.CompileSlotValidationAsync(simplifiedConstraint.MainScript);
-            return validator;
-        }
-
-
-
-        #endregion
+      
     }
 }

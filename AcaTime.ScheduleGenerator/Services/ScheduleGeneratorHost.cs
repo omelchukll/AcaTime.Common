@@ -62,9 +62,9 @@ namespace AcaTime.ScheduleGenerator.Services
                 estimation.Func = await _scriptExecutionService.CompileScheduleEstimationAsync(estimation.MainScript);
             }
 
-            foreach (var estimation in scheduleData.UserFunctions.ScheduleSlotEstimations)
+            foreach (var estimation in scheduleData.UserFunctions.SlotValueEstimations)
             {
-                estimation.Func = await _scriptExecutionService.CompileSlotEstimationAsync(estimation.MainScript);
+                estimation.Func = await _scriptExecutionService.CompileSlotValueEstimationAsync(estimation.MainScript);
             }
 
             foreach (var constraint in scheduleData.UserFunctions.UnitaryConstraints)
@@ -73,9 +73,9 @@ namespace AcaTime.ScheduleGenerator.Services
                 constraint.Func = await _scriptExecutionService.CompileUnarySlotValidationAsync(constraint.MainScript);
             }
 
-            foreach (var constraint in scheduleData.UserFunctions.SlotPriorities)
+            foreach (var constraint in scheduleData.UserFunctions.SlotEstimations)
             {
-                constraint.Func = await _scriptExecutionService.CompileSlotPriorityEstimationAsync(constraint.MainScript);
+                constraint.Func = await _scriptExecutionService.CompileSlotEstimationAsync(constraint.MainScript);
             }
 
             foreach (var constraint in scheduleData.UserFunctions.SlotValidators)

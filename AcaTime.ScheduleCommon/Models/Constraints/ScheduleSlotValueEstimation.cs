@@ -5,7 +5,7 @@ namespace AcaTime.ScheduleCommon.Models.Constraints
     /// <summary>
     /// Оцінка комірки розкладу
     /// </summary>
-    public class ScheduleSlotEstimation : BaseConstraint
+    public class ScheduleSlotValueEstimation : BaseConstraint
     {
         public Func<IScheduleSlot, IAssignedSlots, int> Func { get; set; }
 

@@ -19,7 +19,7 @@ namespace AcaTime.ScheduleCommon.Models.Constraints
         /// <summary>
         /// Функції оцінки оптимальності значення слоту 
         /// </summary>
-        public List<ScheduleSlotEstimation> ScheduleSlotEstimations { get; set; }
+        public List<ScheduleSlotValueEstimation> SlotValueEstimations { get; set; }
 
         /// <summary>
         /// Абсолютні обмеження на значення слоту
@@ -27,9 +27,9 @@ namespace AcaTime.ScheduleCommon.Models.Constraints
         public List<UnitaryConstraint> UnitaryConstraints { get; set; }
 
         /// <summary>
-        /// Пріоритет визначення розкладу для слоту 
+        /// Функції оцінки для слоту 
         /// </summary>
-        public List<SlotPriorityEstimation> SlotPriorities { get; set; }
+        public List<SlotEstimation> SlotEstimations { get; set; }
 
         /// <summary>
         /// Обмеження на значення слоту відносно інших розподілених слотів

@@ -70,13 +70,13 @@ namespace AcaTime.ScheduleCommon.Services
                         var res1 = await CompileScheduleEstimationAsync(scriptBody);
                         break;
                     case 2:
-                        var res2 = await CompileSlotEstimationAsync(scriptBody);
+                        var res2 = await CompileSlotValueEstimationAsync(scriptBody);
                         break;
                     case 3:
                         var res3 = await CompileSlotValidationAsync(scriptBody);
                         break;
                     case 4:
-                        var res4 = await CompileSlotPriorityEstimationAsync(scriptBody);
+                        var res4 = await CompileSlotEstimationAsync(scriptBody);
                         break;
                     case 11:
                         var res11 = await CompileUnarySlotValidationAsync(scriptBody);
@@ -123,7 +123,7 @@ namespace AcaTime.ScheduleCommon.Services
         /// </summary>
         /// <param name="scriptBody"></param>
         /// <returns></returns>
-        public async Task<Func<IScheduleSlot, IAssignedSlots, int>> CompileSlotEstimationAsync(string scriptBody)
+        public async Task<Func<IScheduleSlot, IAssignedSlots, int>> CompileSlotValueEstimationAsync(string scriptBody)
         {
             var script = scriptBody;
 
@@ -203,12 +203,12 @@ namespace AcaTime.ScheduleCommon.Services
         /// </summary>
         /// <param name="scriptBody"></param>
         /// <returns></returns>
-        public async Task<Func<ISlotPriority, int>> CompileSlotPriorityEstimationAsync(string scriptBody)
+        public async Task<Func<ISlotEstimation, int>> CompileSlotEstimationAsync(string scriptBody)
         {
             var script = scriptBody;
 
             // Компілюємо скрипт і отримуємо делегат
-            var compiledDelegate = await CSharpScript.EvaluateAsync<Func<ISlotPriority, int>>(
+            var compiledDelegate = await CSharpScript.EvaluateAsync<Func<ISlotEstimation, int>>(
                 script,
                 _scriptOptions
             );

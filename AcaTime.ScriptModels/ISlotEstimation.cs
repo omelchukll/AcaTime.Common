@@ -1,9 +1,9 @@
 ﻿namespace AcaTime.ScriptModels
 {
     /// <summary>
-    /// Інтерфейс для пріоритету слотів
+    /// Інтерфейс для оцінки слотів
     /// </summary>
-    public interface ISlotPriority
+    public interface ISlotEstimation
     {
         /// <summary>
         /// Кількість можливих варіантів для розкладу

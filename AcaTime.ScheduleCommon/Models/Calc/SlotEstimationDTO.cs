@@ -10,7 +10,7 @@ namespace AcaTime.ScheduleCommon.Models.Calc
     /// <summary>
     /// DTO для оцінки пріоритету залучення слота в розподіл розкладу.
     /// </summary>
-    public class SlotPriorityDTO : ISlotPriority
+    public class SlotEstimationDTO : ISlotEstimation
     {
         /// <summary>Кількість доступних доменів для слота (наприклад, кількість доступних аудиторій).</summary>
         public int AvailableDomains { get; set; }
@@ -29,6 +29,6 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// </summary>
         public GroupSubjectDTO GroupSubject { get; set; }
 
-        IGroupSubject ISlotPriority.GroupSubject => GroupSubject;
+        IGroupSubject ISlotEstimation.GroupSubject => GroupSubject;
     }
 }

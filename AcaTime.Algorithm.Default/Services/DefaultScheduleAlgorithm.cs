@@ -20,44 +20,7 @@ namespace AcaTime.Algorithm.Default.Services
         DefaultScheduleAlgorithmUnit defaultUnit;
         private ILogger logger;
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
-
-         public async Task<List<AlgorithmResultDTO>> RunSync(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, ILogger logger, CancellationToken cancellationToken = default)
-        {
-            this.logger = logger;
-
-            var runParameters = new AlgorithmParams(parameters);
-
-            defaultUnit = new DefaultScheduleAlgorithmUnit();
-            defaultUnit.Setup(root, logger, userFunctions, runParameters);
-
-            await Load();
-
-            var results = new List<AlgorithmResultDTO>();
-
-            // Створюємо джерело токенів скасування, яке можна використовувати для обмеження часу виконання
-            using var timeoutCts = new CancellationTokenSource();
-            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken);
-
-            // Встановлюємо таймаут, якщо він вказаний в параметрах
-            if (runParameters.TimeoutInSeconds > 0)
-            {
-                timeoutCts.CancelAfter(TimeSpan.FromSeconds(runParameters.TimeoutInSeconds));
-            }
-
-            for (int i = 0; i < runParameters.ResultsCount; i++)
-            {
-                var unit = defaultUnit.Clone();
-                var result = await unit.DoAll(linkedCts.Token);
-                if (result != null)
-                    results.Add(result);
-                if (results.Count > runParameters.ResultsCount)
-                    results = results.OrderBy(x => x.TotalEstimation).Take(runParameters.ResultsCount).ToList();
-            }
-
-            return results;
-        }
-
-
+        
         public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, ILogger logger, CancellationToken cancellationToken = default)
         {
             this.logger = logger;
@@ -66,7 +29,6 @@ namespace AcaTime.Algorithm.Default.Services
 
             this.RunParameters = runParameters;
             this.StartTime = DateTime.Now;
-
 
             defaultUnit = new DefaultScheduleAlgorithmUnit();
             defaultUnit.Setup(root, logger, userFunctions, runParameters);
@@ -101,8 +63,6 @@ namespace AcaTime.Algorithm.Default.Services
             {
                 // Запускаємо паралельні обчислення
 
-
-
                 logger.LogInformation($"Start calc batch. MaxIterations: {runParameters.MaxIterations}. MaxDegreeOfParallelism: {parallelOptions.MaxDegreeOfParallelism}");
                 await Parallel.ForEachAsync(
                     Enumerable.Range(0, runParameters.MaxIterations),
@@ -117,8 +77,7 @@ namespace AcaTime.Algorithm.Default.Services
 
                         timeoutOneCts.CancelAfter(TimeSpan.FromSeconds(timeOneSec));
 
-
-                        var result = await unit.DoAll(linkedOneCts.Token).ConfigureAwait(false);
+                        var result = await unit.Run(linkedOneCts.Token).ConfigureAwait(false);
 
                         if (result != null)
                         {
@@ -193,27 +152,15 @@ namespace AcaTime.Algorithm.Default.Services
             return slots;
         }
 
-
+        /// <summary>
+        /// Виконуємо крокі які спільні для всіх юнітів. Підготавлюємо кеш.
+        /// </summary>
         private async Task Load()
         {
-
-           //  перевірка чи всі слоти мають викладача
-           foreach (var gs in defaultUnit.Root.GroupSubjects.Where(x => x.ScheduleSlots.Count > 0))
-           {
-                // перевірка що має групи
-                if (gs.Groups.Count == 0)
-                    throw new Exception($"Груповий предмет {gs.Subject.Name} не має груп");
-
-                // перевірка що має викладача
-                if (gs.Teacher == null)
-                    throw new Exception($"Груповий предмет {gs.Subject.Name} для групи {gs.Groups.First().Name} не має викладача");
-           }
-
-
             var domains = GenerateAvailableDomainValues();
             defaultUnit.Slots = defaultUnit.Root.GroupSubjects.SelectMany(x => x.ScheduleSlots).ToDictionary(x => x as IScheduleSlot, x => new SlotTracker { ScheduleSlot = x, AvailableDomains = new SortedSet<DomainValue>(domains) });
 
-            // unitary constraints check
+            // перевірка обмежень на одиничні слоти
             foreach (var a in defaultUnit.UserFunctions.UnitaryConstraints)
             {
                 var sl = a.Select(defaultUnit.Root);
@@ -256,10 +203,11 @@ namespace AcaTime.Algorithm.Default.Services
                 defaultUnit.groupsSlots[k] = defaultUnit.groupsSlots[k].Distinct().ToList();
             }
 
-
+            // групуємо слоти по серіям
             GroupAndFilterSeries();
-            defaultUnit.FirstTrackers = defaultUnit.Slots.Values.Where(x => x.IsFirstTrackerInSeries).ToList();
 
+            // зберігаємо перші слоти серій
+            defaultUnit.FirstTrackers = defaultUnit.Slots.Values.Where(x => x.IsFirstTrackerInSeries).ToList();
         }
 
 
@@ -340,8 +288,7 @@ namespace AcaTime.Algorithm.Default.Services
                     else
                     {
                         lastDayForFirstSlot = firstTracker.AvailableDomains.Min().Date.AddDays(7 * weekShift - 1);
-                    }
-                    
+                    }                    
               
                     // Обмежуємо доменні значення першого слота серії, щоб вони покривали лише перший тиждень або два
                      var rejectsForTracker = firstTracker.AvailableDomains
@@ -362,7 +309,6 @@ namespace AcaTime.Algorithm.Default.Services
                     throw new Exception($"Не вдалося розподілити всі слоти для предмету '{subject.Subject.Name}'. Сума визначених серій ({definedSeries.Sum(s => s.NumberOfLessons)}) менша за кількість слотів ({trackers.Count}).");
                 }
             }
-
 
             foreach (var subject in defaultUnit.Root.GroupSubjects.Where(x => x.Subject.DefinedSeries == null || x.Subject.DefinedSeries.Count == 0))
             {

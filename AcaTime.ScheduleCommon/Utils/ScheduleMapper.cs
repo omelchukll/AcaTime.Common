@@ -175,9 +175,9 @@ namespace AcaTime.ScheduleCommon.Utils
             return new SimplifiedUserFunctionsDTO
             {
                 ScheduleEstimations = MapConstraints(userFunctions.ScheduleEstimations),
-                ScheduleSlotEstimations = MapConstraints(userFunctions.ScheduleSlotEstimations),
+                ScheduleSlotEstimations = MapConstraints(userFunctions.SlotValueEstimations),
                 UnitaryConstraints = MapConstraints(userFunctions.UnitaryConstraints),
-                SlotPriorities = MapConstraints(userFunctions.SlotPriorities),
+                SlotPriorities = MapConstraints(userFunctions.SlotEstimations),
                 SlotValidators = MapConstraints(userFunctions.SlotValidators)
             };
         }
