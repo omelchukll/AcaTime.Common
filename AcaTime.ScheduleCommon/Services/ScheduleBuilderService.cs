@@ -117,7 +117,7 @@ namespace AcaTime.ScheduleCommon.Services
                 GenerateScheduleSlots(root);
                 ChecAndPatchkData(root, ignoreClassrooms);
                 dd.Step("load");
-                resultDTOs = await scheduleAlgorithm.Run(root, userFunctions, parameters, logger, cancellationToken);
+                resultDTOs = await scheduleAlgorithm.Run(root, userFunctions, parameters, ignoreClassrooms, logger, cancellationToken);
             }
             catch (Exception ex)
             {

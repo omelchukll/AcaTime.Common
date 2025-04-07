@@ -12,13 +12,8 @@ namespace AcaTime.ScheduleCommon.Abstract
 
         /// <summary>
         /// Запускає алгоритм розподілу розкладу
-        /// </summary>
-        /// <param name="root"></param>
-        /// <param name="userFunctions"></param>
-        /// <param name="parameters"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, ILogger logger, CancellationToken cancellationToken = default);
+        /// </summary>        
+        Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Отримує статистику роботи алгоритму

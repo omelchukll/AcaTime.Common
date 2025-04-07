@@ -7,6 +7,7 @@ using AcaTime.ScheduleCommon.Utils;
 using AcaTime.ScriptModels;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Runtime.CompilerServices;
 
 namespace AcaTime.Algorithm.Default.Services
@@ -32,6 +33,7 @@ namespace AcaTime.Algorithm.Default.Services
         internal ILogger logger;
         private CancellationToken cancelToken;
 
+        public bool ignoreClassrooms { get; private set; }
         public Dictionary<IScheduleSlot, SlotTracker> Slots { get; internal set; }
 
         // для заміру часа виконання
@@ -48,6 +50,7 @@ namespace AcaTime.Algorithm.Default.Services
         private Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>> assignedSlotsByGroupDate = new Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>>();
         private HashSet<SlotTracker> unassignedFirstSlots;
         private Dictionary<long, List<SlotTracker>> firstSlotsByGroupSubjects;
+        private Dictionary<DateTime, Dictionary<int, Dictionary<ClassroomDTO, ScheduleSlotDTO>>> assignedClassrooms = new Dictionary<DateTime, Dictionary<int, Dictionary<ClassroomDTO, ScheduleSlotDTO>>>();
 
 
         /// <summary>
@@ -84,9 +87,10 @@ namespace AcaTime.Algorithm.Default.Services
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<AlgorithmResultDTO> Run(CancellationToken token)
+        public async Task<AlgorithmResultDTO> Run(CancellationToken token, bool ignoreClassrooms)
         {
             cancelToken = token;
+            this.ignoreClassrooms = ignoreClassrooms;
             DebugData = new DebugData(algorithmName, true);
 
             PreparePrivateCash();
@@ -399,6 +403,14 @@ namespace AcaTime.Algorithm.Default.Services
             if (!standartValidation)
                 return false;
 
+            // Перевірка на аудиторії, якщо алгоритм має враховувати їх
+            if (!ignoreClassrooms && !slotTracker.ScheduleSlot.GroupSubject.Subject.NoClassroom)
+            {
+                var classroomValidation = ValidateAndSelectClassroom(slotTracker.ScheduleSlot, domain, assignedSLots);
+                if (!classroomValidation)
+                    return false;
+            }
+
             foreach (var validator in UserFunctions.SlotValidators)
             {
                 var userValidation = validator.Validate(slotAdapter, assignedSLots);
@@ -407,6 +419,110 @@ namespace AcaTime.Algorithm.Default.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Перевіряє, чи є доступні аудиторії для даного слоту у вказаний час і вибирає найкращу
+        /// </summary>
+        /// <param name="slot">Слот розкладу</param>
+        /// <param name="domain">Доменне значення (дата і номер пари)</param>
+        /// <param name="assignedSLots">Вже призначені слоти</param>
+        /// <returns>true, якщо є доступні аудиторії, false - якщо немає</returns>
+        private bool ValidateAndSelectClassroom(ScheduleSlotDTO slot, DomainValue domain, IAssignedSlots assignedSLots)
+        {
+            // Якщо предмет не потребує аудиторії, перевірка не потрібна
+            if (ignoreClassrooms || slot.GroupSubject.Subject.NoClassroom)
+                return true;
+
+            // Кількість студентів, для яких потрібна аудиторія
+            int requiredStudentCount = slot.GroupSubject.StudentCount;
+
+            // Отримання списку підходящих аудиторій за типом
+            var requiredClassroomTypes = slot.GroupSubject.Subject.ClassroomTypes
+                .Select(ct => ct.ClassroomTypeId)
+                .ToHashSet();
+
+            // Отримуємо пріоритетний тип аудиторії, враховуючи сортування в ClassroomTypes згідно приоритету
+            var priorityClassroomTypeId = slot.GroupSubject.Subject.ClassroomTypes.FirstOrDefault()?.ClassroomTypeId;
+
+            if (priorityClassroomTypeId == null)
+                throw new Exception($"Не вказаний тип аудиторії для предмету {slot.GroupSubject.Subject.Name}");
+
+            // Фільтр для аудиторій, які підходять за типом та розміром
+            var filterLambda = (ClassroomDTO x) => x.StudentCount >= requiredStudentCount && x.ClassroomTypes.Any(ct => requiredClassroomTypes.Contains(ct.ClassroomTypeId));
+            
+            // Стандартний жадібний метод
+            var freeClassrooms = (assignedClassrooms.ContainsKey(domain.Date) && assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber)) 
+                ? Root.Classrooms.Where(x => !assignedClassrooms[domain.Date][domain.PairNumber].ContainsKey(x) && filterLambda(x)) 
+                : Root.Classrooms.Where(filterLambda);
+
+            // Сортування аудиторій за пріоритетом
+            var sortLambda = (ClassroomDTO x) => {
+                if (x.ClassroomTypes.First().ClassroomTypeId == priorityClassroomTypeId)
+                    return 1000000;
+                if (requiredClassroomTypes.Contains(x.ClassroomTypes.First().ClassroomTypeId))
+                    return 1000;
+                return 100;
+            };
+
+            // Вибір найкращої аудиторії
+            var classrooms = freeClassrooms.OrderByDescending(x => sortLambda(x)).ThenBy(x => x.StudentCount).FirstOrDefault();
+            
+            // Якщо жадібний алгоритм знайшов аудиторію, використовуємо її
+            if (classrooms != null)
+            {
+                // Призначаємо аудиторію
+                slot.Classroom = classrooms;
+                return true;
+            }
+            
+            // Якщо жадібний алгоритм не знайшов аудиторію, спробуємо використати алгоритм Хопкрофта-Карпа
+            // для оптимального перерозподілу аудиторій
+            return TryReallocateClassroomsWithHopcroftKarp(slot, domain);
+        }
+
+        /// <summary>
+        /// Намагається перерозподілити аудиторії за допомогою алгоритму Хопкрофта-Карпа
+        /// </summary>
+        /// <param name="slot">Слот, для якого потрібна аудиторія</param>
+        /// <param name="domain">Доменне значення (дата і номер пари)</param>
+        /// <returns>true, якщо вдалося призначити аудиторію, false - якщо ні</returns>
+        private bool TryReallocateClassroomsWithHopcroftKarp(ScheduleSlotDTO slot, DomainValue domain)
+        {
+            // Якщо немає призначених аудиторій або немає потреби в аудиторії, виходимо
+            if (!assignedClassrooms.ContainsKey(domain.Date) || 
+                !assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber) || 
+                slot.GroupSubject.Subject.NoClassroom)
+                return false;
+            
+            // Збираємо всі слоти, включаючи поточний, для яких потрібно призначити аудиторії
+            var slotsWithClassrooms = new List<ScheduleSlotDTO>(
+                assignedClassrooms[domain.Date][domain.PairNumber].Values);
+            slotsWithClassrooms.Add(slot);
+            
+            // Виконуємо алгоритм Хопкрофта-Карпа для пошуку оптимального розподілу
+            var bipartiteMatching = HopcroftKarpAlgorithm.FindOptimalClassroomAssignment(slotsWithClassrooms, Root.Classrooms);
+            
+            // Якщо знайдено розподіл і в ньому є поточний слот
+            if (bipartiteMatching != null && bipartiteMatching.ContainsKey(slot) && bipartiteMatching.Count == slotsWithClassrooms.Count)
+            {
+                // Тимчасово запам'ятовуємо призначення для нового слоту
+                var assignedClassroom = bipartiteMatching[slot];
+                
+                // Не застосовуємо зміни одразу, лише призначаємо аудиторію для поточного слоту
+                slot.Classroom = assignedClassroom;
+
+                assignedClassrooms[domain.Date][domain.PairNumber] = new Dictionary<ClassroomDTO, ScheduleSlotDTO>();
+
+                foreach (var pair in bipartiteMatching.Where(x => x.Key != slot))
+                {
+                    assignedClassrooms[domain.Date][domain.PairNumber][pair.Value] = pair.Key;
+                    pair.Key.Classroom = pair.Value;
+                }
+                
+                return true;
+            }            
+            return false;
         }
 
         /// <summary>
@@ -482,7 +598,21 @@ namespace AcaTime.Algorithm.Default.Services
                     assignedSlotsByGroupDate[group.Id][val.Date] = new HashSet<SlotTracker>();
 
                 assignedSlotsByGroupDate[group.Id][val.Date].Add(slot);
-            }          
+            }  
+            
+            if (slot.ScheduleSlot.Classroom != null)
+            {
+                if (!assignedClassrooms.ContainsKey(val.Date))
+                    assignedClassrooms[val.Date] = new Dictionary<int, Dictionary<ClassroomDTO, ScheduleSlotDTO>>();
+                
+                if (!assignedClassrooms[val.Date].ContainsKey(val.PairNumber))
+                    assignedClassrooms[val.Date][val.PairNumber] = new Dictionary<ClassroomDTO, ScheduleSlotDTO>();
+
+                if (assignedClassrooms[val.Date][val.PairNumber].ContainsKey(slot.ScheduleSlot.Classroom))
+                    throw new Exception($"Аудиторія {slot.ScheduleSlot.Classroom.Name} вже зайнята на {val.Date.ToShortDateString()} {val.PairNumber} парі");
+
+                assignedClassrooms[val.Date][slot.ScheduleSlot.PairNumber][slot.ScheduleSlot.Classroom] = slot.ScheduleSlot;
+            }
         }
 
         /// <summary>
@@ -496,8 +626,16 @@ namespace AcaTime.Algorithm.Default.Services
                 assignedSlotsByTeacherDate[slot.ScheduleSlot.GroupSubject.Teacher.Id][slot.ScheduleSlot.Date].Remove(slot);
                 foreach (var group in slot.ScheduleSlot.GroupSubject.Groups)
                     assignedSlotsByGroupDate[group.Id][slot.ScheduleSlot.Date].Remove(slot);
+
+                if (slot.ScheduleSlot.Classroom!= null)
+                   assignedClassrooms[slot.ScheduleSlot.Date][slot.ScheduleSlot.PairNumber].Remove(slot.ScheduleSlot.Classroom); 
+
+                // Очищаємо аудиторію
+                slot.ScheduleSlot.Classroom = null;
             }
             slot.IsAssigned = false;
+
+                   
         }
 
 

@@ -65,15 +65,14 @@ namespace AcaTime.Algorithm.Default.Services.Calc
                 }
 
                 var variants = groupAdjacentSlots.Union([slot]).SelectMany(x => x.GroupSubject.Groups.Where(g => g.Id == candidateGroup.Id)).Select(x => new { variant = x.SubgroupVariantId ?? 0, subgroup = x.SubgroupId ?? 0 });
-                var maxInVariants = variants
- .GroupBy(v => v.variant)
- .Select(g => new
- {
-     Variant = g.Key,
-     MaxCount = g.GroupBy(x => x.subgroup)
-                 .Max(subGroup => subGroup.Count())
- })
- .ToList();
+                var maxInVariants = variants.GroupBy(v => v.variant)
+                                             .Select(g => new
+                                             {
+                                                 Variant = g.Key,
+                                                 MaxCount = g.GroupBy(x => x.subgroup)
+                                                             .Max(subGroup => subGroup.Count())
+                                             })
+                                             .ToList();
 
                 var maxStudentLessons = maxInVariants.Sum(x => x.MaxCount);
 

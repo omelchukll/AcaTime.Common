@@ -21,7 +21,7 @@ namespace AcaTime.Algorithm.Default.Services
         private ILogger logger;
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
         
-        public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, ILogger logger, CancellationToken cancellationToken = default)
+        public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default)
         {
             this.logger = logger;
 
@@ -77,7 +77,7 @@ namespace AcaTime.Algorithm.Default.Services
 
                         timeoutOneCts.CancelAfter(TimeSpan.FromSeconds(timeOneSec));
 
-                        var result = await unit.Run(linkedOneCts.Token).ConfigureAwait(false);
+                        var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
 
                         if (result != null)
                         {
