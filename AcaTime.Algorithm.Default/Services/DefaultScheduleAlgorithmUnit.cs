@@ -8,6 +8,7 @@ using AcaTime.ScriptModels;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
+using System.Net.Security;
 using System.Runtime.CompilerServices;
 
 namespace AcaTime.Algorithm.Default.Services
@@ -53,6 +54,10 @@ namespace AcaTime.Algorithm.Default.Services
         private Dictionary<DateTime, Dictionary<int, Dictionary<ClassroomDTO, ScheduleSlotDTO>>> assignedClassrooms = new Dictionary<DateTime, Dictionary<int, Dictionary<ClassroomDTO, ScheduleSlotDTO>>>();
 
 
+        private int lastStep = 0; // для відстеження останнього кроку рекурсії
+        private ScheduleSlotDTO lastProcessingSlot = null; // для відстеження останнього слоту в обробці
+        private ScheduleSlotDTO lastAssignedSlot = null; // для відстеження останнього призначеного слоту
+
         /// <summary>
         /// Налаштування алгоритму
         /// </summary>
@@ -68,7 +73,7 @@ namespace AcaTime.Algorithm.Default.Services
             Parameters = parameters;
         }
 
-        private void PreparePrivateCash() 
+        private void PreparePrivateCash()
         {
             firstSlotsByGroupSubjects = FirstTrackers
                 .Where(x => !x.IsAssigned && x.IsFirstTrackerInSeries)
@@ -104,13 +109,19 @@ namespace AcaTime.Algorithm.Default.Services
             }
             catch (OperationCanceledException)
             {
-                logger.LogWarning($"{algorithmName}: Скасування роботи алгоритму");
+                logger.LogWarning($"{algorithmName}: Скасування роботи алгоритму"); 
+                 logger.LogWarning($"   Останній шаг: {lastStep}");
+                 logger.LogWarning($"   Останній слот: {lastProcessingSlot.GroupSubject.Subject.Name} {lastProcessingSlot.GroupSubject.Groups.First().EducationalProgramName} {String.Join(",", lastProcessingSlot.GroupSubject.Groups.Select(g => g.Name))}");
+                 logger.LogWarning($"   Останнє призначення: {lastAssignedSlot.GroupSubject.Subject.Name} {lastAssignedSlot.GroupSubject.Groups.First().EducationalProgramName} {String.Join(",", lastAssignedSlot.GroupSubject.Groups.Select(g => g.Name))}");
                 success = false;
             }
 
             var res = new AlgorithmResultDTO();
             if (success)
             {
+                ButifyResult();
+
+
                 int scheduleEstimation = 0;
                 foreach (var s in UserFunctions.ScheduleEstimations)
                 {
@@ -124,6 +135,9 @@ namespace AcaTime.Algorithm.Default.Services
                 res.TotalEstimation = scheduleEstimation;
                 res.ScheduleSlots = Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
                 res.Name = algorithmName;
+
+                CheckResult(res);
+
                 logger.LogInformation($"{algorithmName}: Schedule points {scheduleEstimation}");
             }
 
@@ -141,6 +155,9 @@ namespace AcaTime.Algorithm.Default.Services
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private bool AssignSlots(int currentStep)
         {
+
+            lastStep = currentStep;
+
             if (cancelToken != null && cancelToken.IsCancellationRequested)
                 cancelToken.ThrowIfCancellationRequested();
 
@@ -150,7 +167,8 @@ namespace AcaTime.Algorithm.Default.Services
             DebugData.Step("start");
 
             // Отримуємо наступний незаповнений слот із застосуванням MRV та пріоритету для лекцій.
-            SlotTracker? nextSlot = GetNextUnassignedSlot();            
+            SlotTracker? nextSlot = GetNextUnassignedSlot();
+
 
             if (nextSlot == null)
             {
@@ -161,7 +179,9 @@ namespace AcaTime.Algorithm.Default.Services
                 }
                 DebugData.Step("check result");
                 return false;
-            }          
+            }
+
+            lastProcessingSlot = nextSlot.ScheduleSlot;
 
             DebugData.Step("next slot");
 
@@ -194,6 +214,8 @@ namespace AcaTime.Algorithm.Default.Services
 
                         if (frwdcheck)
                         {
+                            lastAssignedSlot = nextSlot.ScheduleSlot;
+
                             // Рекурсивно пробуємо наступні призначення.
                             if (AssignSlots(currentStep + 1))
                             {
@@ -296,8 +318,8 @@ namespace AcaTime.Algorithm.Default.Services
         /// <returns>Незаповнений слот, або null якщо таких немає.</returns>
         private SlotTracker? GetNextUnassignedSlot()
         {
-           return unassignedFirstSlots           
-            .ResortFirstK((s) => EstimateSlot(s), Parameters.SlotsTopK, Parameters.SlotsTemperature).FirstOrDefault();
+            return unassignedFirstSlots
+             .ResortFirstK((s) => EstimateSlot(s), Parameters.SlotsTopK, Parameters.SlotsTemperature).FirstOrDefault();
         }
 
         /// <summary>
@@ -450,14 +472,15 @@ namespace AcaTime.Algorithm.Default.Services
 
             // Фільтр для аудиторій, які підходять за типом та розміром
             var filterLambda = (ClassroomDTO x) => x.StudentCount >= requiredStudentCount && x.ClassroomTypes.Any(ct => requiredClassroomTypes.Contains(ct.ClassroomTypeId));
-            
+
             // Стандартний жадібний метод
-            var freeClassrooms = (assignedClassrooms.ContainsKey(domain.Date) && assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber)) 
-                ? Root.Classrooms.Where(x => !assignedClassrooms[domain.Date][domain.PairNumber].ContainsKey(x) && filterLambda(x)) 
+            var freeClassrooms = (assignedClassrooms.ContainsKey(domain.Date) && assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber))
+                ? Root.Classrooms.Where(x => !assignedClassrooms[domain.Date][domain.PairNumber].ContainsKey(x) && filterLambda(x))
                 : Root.Classrooms.Where(filterLambda);
 
             // Сортування аудиторій за пріоритетом
-            var sortLambda = (ClassroomDTO x) => {
+            var sortLambda = (ClassroomDTO x) =>
+            {
                 if (x.ClassroomTypes.First().ClassroomTypeId == priorityClassroomTypeId)
                     return 1000000;
                 if (requiredClassroomTypes.Contains(x.ClassroomTypes.First().ClassroomTypeId))
@@ -467,7 +490,7 @@ namespace AcaTime.Algorithm.Default.Services
 
             // Вибір найкращої аудиторії
             var classrooms = freeClassrooms.OrderByDescending(x => sortLambda(x)).ThenBy(x => x.StudentCount).FirstOrDefault();
-            
+
             // Якщо жадібний алгоритм знайшов аудиторію, використовуємо її
             if (classrooms != null)
             {
@@ -475,7 +498,7 @@ namespace AcaTime.Algorithm.Default.Services
                 slot.Classroom = classrooms;
                 return true;
             }
-            
+
             // Якщо жадібний алгоритм не знайшов аудиторію, спробуємо використати алгоритм Хопкрофта-Карпа
             // для оптимального перерозподілу аудиторій
             return TryReallocateClassroomsWithHopcroftKarp(slot, domain);
@@ -490,25 +513,25 @@ namespace AcaTime.Algorithm.Default.Services
         private bool TryReallocateClassroomsWithHopcroftKarp(ScheduleSlotDTO slot, DomainValue domain)
         {
             // Якщо немає призначених аудиторій або немає потреби в аудиторії, виходимо
-            if (!assignedClassrooms.ContainsKey(domain.Date) || 
-                !assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber) || 
+            if (!assignedClassrooms.ContainsKey(domain.Date) ||
+                !assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber) ||
                 slot.GroupSubject.Subject.NoClassroom)
                 return false;
-            
+
             // Збираємо всі слоти, включаючи поточний, для яких потрібно призначити аудиторії
             var slotsWithClassrooms = new List<ScheduleSlotDTO>(
                 assignedClassrooms[domain.Date][domain.PairNumber].Values);
             slotsWithClassrooms.Add(slot);
-            
+
             // Виконуємо алгоритм Хопкрофта-Карпа для пошуку оптимального розподілу
             var bipartiteMatching = HopcroftKarpAlgorithm.FindOptimalClassroomAssignment(slotsWithClassrooms, Root.Classrooms);
-            
+
             // Якщо знайдено розподіл і в ньому є поточний слот
             if (bipartiteMatching != null && bipartiteMatching.ContainsKey(slot) && bipartiteMatching.Count == slotsWithClassrooms.Count)
             {
                 // Тимчасово запам'ятовуємо призначення для нового слоту
                 var assignedClassroom = bipartiteMatching[slot];
-                
+
                 // Не застосовуємо зміни одразу, лише призначаємо аудиторію для поточного слоту
                 slot.Classroom = assignedClassroom;
 
@@ -519,9 +542,9 @@ namespace AcaTime.Algorithm.Default.Services
                     assignedClassrooms[domain.Date][domain.PairNumber][pair.Value] = pair.Key;
                     pair.Key.Classroom = pair.Value;
                 }
-                
+
                 return true;
-            }            
+            }
             return false;
         }
 
@@ -552,6 +575,54 @@ namespace AcaTime.Algorithm.Default.Services
             else
                 score += Estimations.DefaultSlotValueEstimation(slotAdapter, assignedSLots);
             return score;
+        }
+
+        /// <summary>
+        /// Спроба перерозподілити аудиторії для серій
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void ButifyResult()
+        {
+            if (!this.ignoreClassrooms)
+            {
+                ClassroomReassignmentService classroomReassignmentService = new ClassroomReassignmentService(logger, Root.Classrooms, Slots.Values.Where(s => s.IsAssigned).Select(s => s.ScheduleSlot).ToList());
+                classroomReassignmentService.ButifyResult();
+            }
+        }
+
+
+        /// <summary>
+        /// Перевірка результату
+        /// </summary>
+        private void CheckResult(AlgorithmResultDTO res)
+        {
+            // якщо зазначено розподіл аудиторій, то перевіряємо, чи всі слоти призначено аудиторії
+            if (!this.ignoreClassrooms)
+            {
+                foreach (var slot in res.ScheduleSlots.Where(x => !x.GroupSubject.Subject.NoClassroom))
+                {
+                    if (slot.Classroom == null)
+                        throw new Exception($"Слот {slot.GroupSubject.Subject.Name} {slot.GroupSubject.Groups.First().Name} {slot.Date.ToShortDateString()} {slot.PairNumber} парі не призначено аудиторію");
+
+                    // перевірка на переповнення аудиторій
+                    if (slot.Classroom.StudentCount < slot.GroupSubject.StudentCount)
+                        throw new Exception($"Аудиторія {slot.Classroom.Name} переповнена. Заплановано {slot.GroupSubject.StudentCount} студентів, але вміст аудиторії {slot.Classroom.StudentCount}");
+
+                    // перевірка на тип аудиторії
+                    if (!slot.Classroom.ClassroomTypes.Any(x => slot.GroupSubject.Subject.ClassroomTypes.Select(x => x.ClassroomTypeId).Contains(x.ClassroomTypeId)))
+                        throw new Exception($"Аудиторія {slot.Classroom.Name} не підходить для предмета {slot.GroupSubject.Subject.Name} {slot.GroupSubject.Groups.First().Name}");
+                }
+
+
+                // перевірка на унікальність аудиторій в розрізі дати та пари
+                var groupedSlots = res.ScheduleSlots.Where(x => x.Classroom != null).GroupBy(x => new { x.Date, x.PairNumber });
+                foreach (var group in groupedSlots)
+                {
+                    var classrooms = group.Select(x => x.Classroom.Id).ToHashSet();
+                    if (classrooms.Count != group.Count())
+                        throw new Exception($"Аудиторія {string.Join(", ", classrooms)} вже призначена для слоту {string.Join(", ", group.Select(x => x.GroupSubject.Subject.Name))} {string.Join(", ", group.Select(x => x.GroupSubject.Groups.First().Name))} {group.Key.Date.ToShortDateString()} {group.Key.PairNumber} парі");
+                }
+            }
         }
 
         #endregion
@@ -598,13 +669,13 @@ namespace AcaTime.Algorithm.Default.Services
                     assignedSlotsByGroupDate[group.Id][val.Date] = new HashSet<SlotTracker>();
 
                 assignedSlotsByGroupDate[group.Id][val.Date].Add(slot);
-            }  
-            
+            }
+
             if (slot.ScheduleSlot.Classroom != null)
             {
                 if (!assignedClassrooms.ContainsKey(val.Date))
                     assignedClassrooms[val.Date] = new Dictionary<int, Dictionary<ClassroomDTO, ScheduleSlotDTO>>();
-                
+
                 if (!assignedClassrooms[val.Date].ContainsKey(val.PairNumber))
                     assignedClassrooms[val.Date][val.PairNumber] = new Dictionary<ClassroomDTO, ScheduleSlotDTO>();
 
@@ -627,15 +698,15 @@ namespace AcaTime.Algorithm.Default.Services
                 foreach (var group in slot.ScheduleSlot.GroupSubject.Groups)
                     assignedSlotsByGroupDate[group.Id][slot.ScheduleSlot.Date].Remove(slot);
 
-                if (slot.ScheduleSlot.Classroom!= null)
-                   assignedClassrooms[slot.ScheduleSlot.Date][slot.ScheduleSlot.PairNumber].Remove(slot.ScheduleSlot.Classroom); 
+                if (slot.ScheduleSlot.Classroom != null)
+                    assignedClassrooms[slot.ScheduleSlot.Date][slot.ScheduleSlot.PairNumber].Remove(slot.ScheduleSlot.Classroom);
 
                 // Очищаємо аудиторію
                 slot.ScheduleSlot.Classroom = null;
             }
             slot.IsAssigned = false;
 
-                   
+
         }
 
 
@@ -648,8 +719,8 @@ namespace AcaTime.Algorithm.Default.Services
             if (slot.IsFirstTrackerInSeries)
             {
                 unassignedFirstSlots.Remove(slot);
-                var firstUnassignedSlot = firstSlotsByGroupSubjects[slot.ScheduleSlot.GroupSubject.Id].FirstOrDefault(x => !x.IsAssigned && x!=slot);
-                if (firstUnassignedSlot != null)                
+                var firstUnassignedSlot = firstSlotsByGroupSubjects[slot.ScheduleSlot.GroupSubject.Id].FirstOrDefault(x => !x.IsAssigned && x != slot);
+                if (firstUnassignedSlot != null)
                     unassignedFirstSlots.Add(firstUnassignedSlot);
             }
         }
@@ -666,7 +737,7 @@ namespace AcaTime.Algorithm.Default.Services
                 if (firstUnassignedSlot != null)
                     unassignedFirstSlots.Remove(firstUnassignedSlot);
                 unassignedFirstSlots.Add(slot);
-            }               
+            }
         }
 
         /// <summary>

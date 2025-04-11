@@ -63,7 +63,7 @@ namespace AcaTime.Algorithm.Default.Services
             {
                 // Запускаємо паралельні обчислення
 
-                logger.LogInformation($"Start calc batch. MaxIterations: {runParameters.MaxIterations}. MaxDegreeOfParallelism: {parallelOptions.MaxDegreeOfParallelism}");
+                logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
                 await Parallel.ForEachAsync(
                     Enumerable.Range(0, runParameters.MaxIterations),
                     parallelOptions,
@@ -112,12 +112,17 @@ namespace AcaTime.Algorithm.Default.Services
                 logger.LogInformation("Обчислення алгоритму було перервано через таймаут або зовнішнє скасування");
             }
 
+            logger.LogInformation($"Завершено розрахунку. Кількість успішних результатів: {statistics.Success}, Найкращий результат: {statistics.BestResult}");
+
             // Повертаємо найкращі результати
-            return results
+            var res = results
                 .OrderByDescending(x => x.TotalEstimation)
                 .Take(runParameters.ResultsCount)
                 .ToList();
-        }
+
+            return res;
+        }      
+
 
         /// <summary>
         /// Отримує статистику роботи алгоритму

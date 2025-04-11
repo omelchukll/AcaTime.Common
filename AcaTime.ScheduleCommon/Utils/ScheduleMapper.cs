@@ -219,7 +219,8 @@ namespace AcaTime.ScheduleCommon.Utils
                 LessonNumber = simplifiedSlot.LessonNumber,
                 Date = simplifiedSlot.Date,
                 PairNumber = simplifiedSlot.PairNumber,
-                LessonSeriesLength = simplifiedSlot.LessonSeriesLength,               
+                LessonSeriesLength = simplifiedSlot.LessonSeriesLength,
+                LessonSeriesId = simplifiedSlot.LessonSeriesId,
                 GroupSubject = new GroupSubjectDTO { Id = simplifiedSlot.GroupSubjectId }
             };
 

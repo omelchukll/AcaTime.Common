@@ -13,7 +13,7 @@ namespace AcaTime.Algorithm.Default.Services.Calc
         /// </summary>
         /// <param name="slots">Список слотів (занять), для яких шукаємо аудиторії.</param>
         /// <returns>Словник (слот -> аудиторія) або null, якщо не вдалося призначити всім слотам.</returns>
-        public static Dictionary<ScheduleSlotDTO, ClassroomDTO>? FindOptimalClassroomAssignment(List<ScheduleSlotDTO> slots, List<ClassroomDTO> classrooms)
+        public static Dictionary<ScheduleSlotDTO, ClassroomDTO> FindOptimalClassroomAssignment(List<ScheduleSlotDTO> slots, List<ClassroomDTO> classrooms)
         {
             // 1. Побудова двочасткового графа (ліва частина — слоти, права — аудиторії).
             //    Записуємо у slotToAvailableClassrooms, які аудиторії підходять для кожного слоту,
@@ -41,7 +41,7 @@ namespace AcaTime.Algorithm.Default.Services.Calc
                 // Якщо жодна аудиторія не підходить хоча б для одного слоту,
                 // далі можна не шукати — повертаємо null
                 if (!suitableClassrooms.Any())
-                    return null;
+                    return new Dictionary<ScheduleSlotDTO, ClassroomDTO>();
 
                 slotToAvailableClassrooms[slot] = suitableClassrooms;
 
@@ -58,9 +58,9 @@ namespace AcaTime.Algorithm.Default.Services.Calc
             var matching = HopcroftKarp(slotToAvailableClassrooms, classroomToAvailableSlots);
 
             // Перевіряємо, чи всі слоти отримали аудиторії
-            int neededSlotsCount = slots.Count();
-            if (matching.Count < neededSlotsCount)
-                return null;
+            //int neededSlotsCount = slots.Count();
+            //if (matching.Count < neededSlotsCount)
+            //    return null;
 
             return matching;
         }

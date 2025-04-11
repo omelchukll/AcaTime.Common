@@ -336,6 +336,7 @@ namespace AcaTime.ScheduleCommon.Utils
                 Date = slot.Date,
                 PairNumber = slot.PairNumber,
                 LessonSeriesLength = slot.LessonSeriesLength,
+                LessonSeriesId = slot.LessonSeriesId,
                 GroupSubjectId = slot.GroupSubject.Id,
                 ClassroomId = slot.Classroom?.Id
             };

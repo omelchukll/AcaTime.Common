@@ -36,6 +36,11 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// </summary>
         public int LessonSeriesLength { get; set; } = 1;
 
+        /// <summary>
+        /// Ідентифікатор серії уроків. Використовується для об'єднання уроків в одну серію.
+        /// </summary>
+        public int? LessonSeriesId { get; set; }
+
         IGroupSubject IScheduleSlot.GroupSubject => GroupSubject;
 
         /// <summary>

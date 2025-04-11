@@ -66,7 +66,7 @@ namespace AcaTime.Algorithm.Default.Models
 
 
         // слоти з однієї серії відносяться до одного предмету та проводяться в один і той самий день тижня з однаковим номером пари
-        public int? SeriesId { get; set; }
+        public int? SeriesId { get { return ScheduleSlot.LessonSeriesId; } set { ScheduleSlot.LessonSeriesId = value; } }
         public int SeriesLength {get {return ScheduleSlot.LessonSeriesLength;} set {ScheduleSlot.LessonSeriesLength = value;}}
         public int WeekShift { get; set; }
         public bool IsFirstTrackerInSeries { get; set; } = false;

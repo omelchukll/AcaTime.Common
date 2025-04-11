@@ -64,6 +64,7 @@ namespace AcaTime.Algorithm.Default.Utils
                 Subject = x.Subject,
                 Faculty = x.Faculty,
                 Groups = x.Groups,
+                StudentCount = x.StudentCount,
                 ScheduleSlots = new List<ScheduleSlotDTO>()
             };
 
@@ -99,6 +100,7 @@ namespace AcaTime.Algorithm.Default.Utils
                 Date = src.Date,
                 PairNumber = src.PairNumber,
                 LessonSeriesLength = src.LessonSeriesLength,
+                LessonSeriesId = src.LessonSeriesId,
                 GroupSubject = groupSubject
             };
 
