@@ -16,19 +16,19 @@ namespace AcaTime.ScheduleCommon.Abstract
         Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Отримує статистику роботи алгоритму
+        /// Отримує статистику роботи алгоритму, довільний формат. Просто корисна інформація для користувача.
         /// </summary>
         /// <returns></returns>
         string GetStatistics();
 
         /// <summary>
-        /// Ім'я алгоритму
+        /// Назва алгоритму. Бажано англомовна і коротка - використовується в конфігах та пропонується на ввод користувачем.
         /// </summary>
         /// <returns></returns>
         string GetName();   
 
         /// <summary>
-        /// Отримує список параметрів, які використовує алгоритм
+        /// Отримує список параметрів, які використовує алгоритм. Значення параметрів або прописуються в конфігурації, або вводяться користувачем. Надаються на вхід функції Run як Dictionary<string, string>.
         /// </summary>
         /// <returns>Список параметрів з описом, типом та значенням за замовчуванням</returns>
         List<AlgorithmParameterDTO> GetParameters();
