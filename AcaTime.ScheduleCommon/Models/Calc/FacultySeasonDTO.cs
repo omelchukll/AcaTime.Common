@@ -17,14 +17,13 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// <summary>Список предметів, закріплених за групами.</summary>
         public List<GroupSubjectDTO> GroupSubjects { get; set; } = new List<GroupSubjectDTO>();
 
-        [Display(Name = "Дата початку занять")]
+        /// <summary>Дата початку занять</summary>
         public DateTime BeginSeason { get; set; } 
 
-        [Display(Name = "Дата завершення занять")]
+        /// <summary>Дата завершення занять</summary>
         public DateTime EndSeason { get; set; }
 
-
-        [Display(Name = "Максимаотна кількість пар в день")]
+        /// <summary>Максимаотна кількість пар в день</summary>
         public int MaxLessonsPerDay { get; set; }
 
         /// <summary>Список аудиторій.</summary>

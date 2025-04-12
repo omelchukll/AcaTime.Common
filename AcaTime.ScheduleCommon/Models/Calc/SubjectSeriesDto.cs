@@ -17,13 +17,11 @@ namespace AcaTime.ScheduleCommon.Models.Calc
         /// </summary>
         public int NumberOfLessons { get; set; }
 
-
+        /// <summary>Тип розбиття серії.</summary>
         public SubjectSeriesSplitType SplitType { get; set; }
 
 
-        /// <summary>
-/// Початок серії може бути в будь-якому тижні, інакше початковий тиждень перший для однотипних серій та перший + другий для двотижневих
-/// </summary>
+        /// <summary>Початок серії може бути в будь-якому тижні, інакше початковий тиждень перший для однотипних серій та перший + другий для двотижневих</summary>
         public bool StartInAnyWeek { get; set; }
       
     }
