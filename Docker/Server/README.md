@@ -10,9 +10,22 @@
 ### 1. Авторизація в GitHub Container Registry
 Для доступу до приватного репозиторію необхідно авторизуватися:
 
+#### Linux:
 ```bash
 # Логін до GitHub Container Registry
 echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
+```
+
+#### Windows (PowerShell):
+```powershell
+# Логін до GitHub Container Registry
+$env:GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
+```
+
+#### Windows (Command Prompt):
+```cmd
+# Логін до GitHub Container Registry
+docker login ghcr.io -u USERNAME -p GITHUB_PAT
 ```
 
 Де:
@@ -21,8 +34,11 @@ echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
 #### Створення GitHub Personal Access Token:
 1. Перейдіть в налаштування: https://github.com/settings/tokens
-2. Створіть токен з правами `read:packages`
-3. Збережіть токен у безпечному місці
+2. Натисніть "Generate new token" та оберіть **"Generate new token (classic)"**
+3. Назвіть токен (наприклад, "AcaTime Docker")
+4. У списку дозволів відмітьте `read:packages`
+5. Нижче на сторінці натисніть "Generate token"
+6. Скопіюйте та збережіть токен у безпечному місці - він буде показаний лише один раз
 
 ### 2. Запуск додатку з Docker Compose
 
