@@ -152,12 +152,13 @@ namespace AcaTime.Algorithm.Genetic.Services
 
                 var defaultResult = res[0];
                 
-                var unit = savedUnit.CloneWithPrivateCache();
+                // var unit = savedUnit.CloneWithPrivateCache();
+                var unit = savedUnit.CloneFromDefault();
                 // var unit = defaultUnit.Clone();
                 unit.initialResult = new AlgorithmResultDTO();
                 
-                logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. DEFAULT RESULT: {defaultResult.TotalEstimation}");
-                logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. GENETIC START: {unit.initialResult.TotalEstimation}");
+                // logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. DEFAULT RESULT: {defaultResult.TotalEstimation}");
+                // logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. GENETIC START: {unit.initialResult.TotalEstimation}");
 
                 var before = defaultResult.TotalEstimation;
                 
@@ -732,7 +733,7 @@ namespace AcaTime.Algorithm.Genetic.Services
         // або можливо не варто виконувати весь алгоритм паралельно,
         // оскільки юніт = популяція, можна викликати самі операції паралельно і дивитись яка з них показує кращий результат,
         // зберігаючи найкращий юніт
-        private void Calculate(GeneticScheduleAlgorithmUnit unit)
+        private void Calculate(GeneticScheduleAlgoUnit unit)
         {
             // Збережемо 
             // var cacheRoot = unit.CloneWithPrivateCache();
