@@ -796,6 +796,7 @@ namespace AcaTime.Algorithm.Genetic.Services
                     // впринципі, вдалими є десь може 1 мутація з 7-8, тож тут можна клонувати,
                     // особливо коли будемо працювати з кількома популяціями.
                     
+                    
                     // UPD: Оскільки наче вдалось з цим ми розібратись, спробуємо не копіювати дані
                     // cacheRoot = unit;
                     // cacheRoot = unit.CloneWithPrivateCache();
