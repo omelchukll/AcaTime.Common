@@ -11,14 +11,14 @@ namespace AcaTime.Algorithm.Genetic.Utils
     public static class CloneHelper
     {
 
-        public static GeneticScheduleAlgoUnit CloneFromDefault(this DefaultScheduleAlgorithmUnit source)
+        public static GeneticScheduleAlgorithmUnit CloneFromDefault(this DefaultScheduleAlgorithmUnit source)
         {
             var resRoot = source.Root.Clone();
 
             Dictionary<GroupSubjectDTO, GroupSubjectDTO> groupMap = source.Root.GroupSubjects.ToDictionary(x => x, x => x.Clone(resRoot));
             Dictionary<SlotTracker, SlotTracker> trackerMap = source.Slots.Values.ToDictionary(x => x, x => x.Clone(groupMap[x.ScheduleSlot.GroupSubject]));
 
-            var res = new GeneticScheduleAlgoUnit();
+            var res = new GeneticScheduleAlgorithmUnit();
 
             res.Setup(resRoot, source.logger, source.UserFunctions, source.Parameters);
 

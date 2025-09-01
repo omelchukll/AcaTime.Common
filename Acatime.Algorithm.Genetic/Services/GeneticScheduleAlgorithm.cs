@@ -733,7 +733,7 @@ namespace AcaTime.Algorithm.Genetic.Services
         // або можливо не варто виконувати весь алгоритм паралельно,
         // оскільки юніт = популяція, можна викликати самі операції паралельно і дивитись яка з них показує кращий результат,
         // зберігаючи найкращий юніт
-        private void Calculate(GeneticScheduleAlgoUnit unit)
+        private void Calculate(GeneticScheduleAlgorithmUnit unit)
         {
             // Збережемо 
             // var cacheRoot = unit.CloneWithPrivateCache();

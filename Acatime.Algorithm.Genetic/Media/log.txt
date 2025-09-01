@@ -1,0 +1,510 @@
+/Users/daniilmiroshnykov/code/dotnet/AcaTime.Common/AcaTime.ScheduleGenerator/bin/Release/net9.0/AcaTime.ScheduleGenerator
+dbug: Microsoft.Extensions.Hosting.Internal.Host[1] Hosting starting
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Назва алгоритму: Genetic
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Параметри алгоритму:
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] ResultsCount: 1
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] MaxIterations: 30
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] TimeoutInSeconds: 130
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] SlotsTopK: 3
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] DomainsTopK: 1
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] SlotsTemperature: 1
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] DomainsTemperature: 1
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] GeneticIterations: 200
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Ігнорувати класи: True
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Адреса сервера: http://localhost:5000/
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Отримуємо дані розкладу...
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Отримані дані 2024-2025 н.р. 2 семестр
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Створюємо розклад...
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] Початок розрахунку. Кількість ітерацій: 30. Кількість паралельних обчислень: 2
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Бонус за вільний день для студентів - 47 - 404100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Бонус за вільний день для студентів - 47 - 401400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Бонус за вільні дні викладачів - 48 - 1814700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Бонус за вільні дні викладачів - 48 - 1812500
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Штраф за більше 3 пар в день - 49 - -1720000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Штраф за більше 3 пар в день - 49 - -1460000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Штраф за вікна між парами для студентів - 50 - -26640
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Штраф за вікна між парами для студентів - 50 - -28360
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Штраф за вікна у розкладі викладачів - 51 - -22620
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Штраф за вікна у розкладі викладачів - 51 - -23250
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Штраф коли група не повністю зайнята на парі - 52 - -70660
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Штраф коли група не повністю зайнята на парі - 52 - -72640
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521: Schedule points 636900
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e: Schedule points 371630
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-cf744ca9-be8a-4651-a8f9-398de80f9521 (start:6ms next slot:637ms candidateDomains:636ms ValidateAssignment:8ms assign:2ms ApplySynchronizedDomainPattern:142ms ForwardCheck:1158ms RestoreRejectedDomains:0ms unassign:0ms total estimation:112ms finish True:4ms All:2710ms)
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f5e999d0-095a-4e10-9282-685e320ba77e (start:6ms next slot:507ms candidateDomains:679ms ValidateAssignment:8ms assign:2ms ApplySynchronizedDomainPattern:145ms ForwardCheck:1234ms RestoreRejectedDomains:0ms unassign:0ms total estimation:120ms finish True:4ms All:2710ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Бонус за вільний день для студентів - 47 - 406000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Бонус за вільні дні викладачів - 48 - 1816600
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Штраф за більше 3 пар в день - 49 - -1860000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Штраф за вікна між парами для студентів - 50 - -29640
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Штраф за вікна у розкладі викладачів - 51 - -19970
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Штраф коли група не повністю зайнята на парі - 52 - -71560
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8: Schedule points 241430
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-d49e96ee-f434-41ac-98b6-04f35e3554c8 (start:3ms next slot:667ms candidateDomains:635ms ValidateAssignment:4ms assign:1ms ApplySynchronizedDomainPattern:134ms ForwardCheck:1097ms RestoreRejectedDomains:0ms unassign:0ms total estimation:66ms finish True:1ms All:2612ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Бонус за вільний день для студентів - 47 - 406300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Бонус за вільні дні викладачів - 48 - 1810400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Штраф за більше 3 пар в день - 49 - -1820000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Штраф за вікна між парами для студентів - 50 - -32840
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Штраф за вікна у розкладі викладачів - 51 - -12960
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Штраф коли група не повністю зайнята на парі - 52 - -70700
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad: Schedule points 280200
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6fdad860-a920-4f39-8927-65d8b21f77ad (start:6ms next slot:588ms candidateDomains:676ms ValidateAssignment:3ms assign:5ms ApplySynchronizedDomainPattern:155ms ForwardCheck:1122ms RestoreRejectedDomains:0ms unassign:0ms total estimation:107ms finish True:1ms All:2667ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Бонус за вільний день для студентів - 47 - 404700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Бонус за вільні дні викладачів - 48 - 1803100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Штраф за більше 3 пар в день - 49 - -1660000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Штраф за вікна між парами для студентів - 50 - -29410
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Штраф за вікна у розкладі викладачів - 51 - -16800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Штраф коли група не повністю зайнята на парі - 52 - -72100
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2: Schedule points 429490
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-2b59edc0-53cf-411e-9377-151678bbacc2 (start:0ms next slot:724ms candidateDomains:718ms ValidateAssignment:3ms assign:1ms ApplySynchronizedDomainPattern:186ms ForwardCheck:1176ms RestoreRejectedDomains:0ms unassign:0ms total estimation:62ms finish True:2ms All:2876ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Бонус за вільний день для студентів - 47 - 401900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Бонус за вільні дні викладачів - 48 - 1812300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Штраф за більше 3 пар в день - 49 - -1760000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Штраф за вікна між парами для студентів - 50 - -22570
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Штраф за вікна у розкладі викладачів - 51 - -25670
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Штраф коли група не повністю зайнята на парі - 52 - -72060
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225: Schedule points 333900
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-27ec90ca-d592-401b-b006-6f6e2fc0f225 (start:1ms next slot:681ms candidateDomains:713ms ValidateAssignment:4ms assign:1ms ApplySynchronizedDomainPattern:172ms ForwardCheck:1177ms RestoreRejectedDomains:0ms unassign:0ms total estimation:79ms finish True:3ms All:2835ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Бонус за вільний день для студентів - 47 - 403800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Бонус за вільні дні викладачів - 48 - 1813900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Штраф за більше 3 пар в день - 49 - -1960000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Штраф за вікна між парами для студентів - 50 - -27970
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Штраф за вікна у розкладі викладачів - 51 - -20200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Штраф коли група не повністю зайнята на парі - 52 - -72420
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f: Schedule points 137110
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-02a49555-ff07-4f16-84cd-6f8722d88b1f (start:11ms next slot:823ms candidateDomains:722ms ValidateAssignment:14ms assign:4ms ApplySynchronizedDomainPattern:241ms ForwardCheck:1495ms RestoreRejectedDomains:0ms unassign:0ms total estimation:43ms finish True:3ms All:3361ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Бонус за вільний день для студентів - 47 - 406500
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Бонус за вільні дні викладачів - 48 - 1805800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Штраф за більше 3 пар в день - 49 - -2360000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Штраф за вікна між парами для студентів - 50 - -21170
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Штраф за вікна у розкладі викладачів - 51 - -21270
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Штраф коли група не повністю зайнята на парі - 52 - -69960
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b: Schedule points -260100
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-aae47781-c3f5-4641-959d-571fe400cb0b (start:1ms next slot:823ms candidateDomains:731ms ValidateAssignment:7ms assign:1ms ApplySynchronizedDomainPattern:234ms ForwardCheck:1431ms RestoreRejectedDomains:0ms unassign:0ms total estimation:41ms finish True:2ms All:3274ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Бонус за вільний день для студентів - 47 - 405500
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Бонус за вільні дні викладачів - 48 - 1825700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Штраф за більше 3 пар в день - 49 - -1720000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Штраф за вікна між парами для студентів - 50 - -31650
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Штраф за вікна у розкладі викладачів - 51 - -20090
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Штраф коли група не повністю зайнята на парі - 52 - -74760
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812: Schedule points 384700
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c4da2836-0771-4f04-bc74-9453edea9812 (start:1ms next slot:651ms candidateDomains:702ms ValidateAssignment:7ms assign:1ms ApplySynchronizedDomainPattern:176ms ForwardCheck:1238ms RestoreRejectedDomains:0ms unassign:0ms total estimation:71ms finish True:5ms All:2854ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Бонус за вільний день для студентів - 47 - 406200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Бонус за вільні дні викладачів - 48 - 1820400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Штраф за більше 3 пар в день - 49 - -1580000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Штраф за вікна між парами для студентів - 50 - -19980
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Штраф за вікна у розкладі викладачів - 51 - -20100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Штраф коли група не повністю зайнята на парі - 52 - -71560
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e: Schedule points 534960
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1982480a-7d14-4bc3-af19-ecc3ea34844e (start:3ms next slot:645ms candidateDomains:750ms ValidateAssignment:4ms assign:1ms ApplySynchronizedDomainPattern:182ms ForwardCheck:1204ms RestoreRejectedDomains:0ms unassign:0ms total estimation:95ms finish True:2ms All:2889ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Бонус за вільний день для студентів - 47 - 406900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Бонус за вільні дні викладачів - 48 - 1805700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Штраф за більше 3 пар в день - 49 - -2540000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Штраф за вікна між парами для студентів - 50 - -22530
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Штраф за вікна у розкладі викладачів - 51 - -17060
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Штраф коли група не повністю зайнята на парі - 52 - -70880
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a: Schedule points -437870
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f10d896d-b52d-4332-8e72-4f7dd206077a (start:1ms next slot:653ms candidateDomains:848ms ValidateAssignment:11ms assign:1ms ApplySynchronizedDomainPattern:156ms ForwardCheck:1255ms RestoreRejectedDomains:0ms unassign:0ms total estimation:91ms finish True:2ms All:3022ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Бонус за вільний день для студентів - 47 - 404300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Бонус за вільні дні викладачів - 48 - 1820000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Штраф за більше 3 пар в день - 49 - -1800000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Штраф за вікна між парами для студентів - 50 - -24130
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Штраф за вікна у розкладі викладачів - 51 - -17970
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Штраф коли група не повністю зайнята на парі - 52 - -72240
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94: Schedule points 309960
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-ffd71ea2-5647-493b-ae9d-e0deb425ef94 (start:3ms next slot:560ms candidateDomains:913ms ValidateAssignment:5ms assign:1ms ApplySynchronizedDomainPattern:143ms ForwardCheck:1153ms RestoreRejectedDomains:0ms unassign:0ms total estimation:155ms finish True:1ms All:2939ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Бонус за вільний день для студентів - 47 - 403800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Бонус за вільні дні викладачів - 48 - 1827600
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Штраф за більше 3 пар в день - 49 - -2520000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Штраф за вікна між парами для студентів - 50 - -24890
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Бонус за вільний день для студентів - 47 - 403100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Штраф за вікна у розкладі викладачів - 51 - -16110
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Бонус за вільні дні викладачів - 48 - 1815200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Штраф коли група не повністю зайнята на парі - 52 - -72160
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093: Schedule points -401760
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-a969663e-2f08-4e72-8918-0d8666c62093 (start:4ms next slot:906ms candidateDomains:918ms ValidateAssignment:4ms assign:2ms ApplySynchronizedDomainPattern:281ms ForwardCheck:1560ms RestoreRejectedDomains:0ms unassign:0ms total estimation:75ms finish True:3ms All:3758ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Штраф за більше 3 пар в день - 49 - -1640000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Штраф за вікна між парами для студентів - 50 - -35570
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Штраф за вікна у розкладі викладачів - 51 - -21580
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Штраф коли група не повністю зайнята на парі - 52 - -74480
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401: Schedule points 446670
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-b558d7e2-9a01-44cb-a494-320963bb1401 (start:2ms next slot:840ms candidateDomains:944ms ValidateAssignment:6ms assign:2ms ApplySynchronizedDomainPattern:262ms ForwardCheck:1651ms RestoreRejectedDomains:0ms unassign:0ms total estimation:104ms finish True:1ms All:3817ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Бонус за вільний день для студентів - 47 - 406900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Бонус за вільні дні викладачів - 48 - 1813600
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Бонус за вільний день для студентів - 47 - 405100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Бонус за вільні дні викладачів - 48 - 1817900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Штраф за більше 3 пар в день - 49 - -2000000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Штраф за вікна між парами для студентів - 50 - -19210
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Штраф за більше 3 пар в день - 49 - -1840000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Штраф за вікна у розкладі викладачів - 51 - -19270
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Штраф за вікна між парами для студентів - 50 - -24290
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Штраф коли група не повністю зайнята на парі - 52 - -71980
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305: Schedule points 110040
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7a180dcf-4e05-470a-8ffb-5fb159a13305 (start:19ms next slot:522ms candidateDomains:655ms ValidateAssignment:3ms assign:0ms ApplySynchronizedDomainPattern:137ms ForwardCheck:1040ms RestoreRejectedDomains:0ms unassign:0ms total estimation:44ms finish True:1ms All:2426ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Штраф за вікна у розкладі викладачів - 51 - -17240
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Штраф коли група не повністю зайнята на парі - 52 - -70640
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce: Schedule points 270830
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-146d363c-c745-42b9-aee3-e36a136718ce (start:13ms next slot:583ms candidateDomains:637ms ValidateAssignment:2ms assign:0ms ApplySynchronizedDomainPattern:131ms ForwardCheck:1060ms RestoreRejectedDomains:0ms unassign:0ms total estimation:44ms finish True:1ms All:2477ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Бонус за вільний день для студентів - 47 - 402400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Бонус за вільні дні викладачів - 48 - 1813800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Штраф за більше 3 пар в день - 49 - -1580000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Штраф за вікна між парами для студентів - 50 - -30060
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Штраф за вікна у розкладі викладачів - 51 - -16100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Штраф коли група не повністю зайнята на парі - 52 - -71740
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150: Schedule points 518300
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1613e1de-c692-4304-8ac9-9cef76703150 (start:5ms next slot:561ms candidateDomains:730ms ValidateAssignment:7ms assign:5ms ApplySynchronizedDomainPattern:156ms ForwardCheck:1181ms RestoreRejectedDomains:0ms unassign:0ms total estimation:51ms finish True:1ms All:2702ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Бонус за вільний день для студентів - 47 - 402100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Бонус за вільні дні викладачів - 48 - 1814400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Штраф за більше 3 пар в день - 49 - -1660000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Штраф за вікна між парами для студентів - 50 - -25330
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Штраф за вікна у розкладі викладачів - 51 - -23700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Штраф коли група не повністю зайнята на парі - 52 - -69980
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00: Schedule points 437490
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-5647ead3-e8e6-4f1d-8af8-cbab5cb72a00 (start:10ms next slot:540ms candidateDomains:739ms ValidateAssignment:5ms assign:0ms ApplySynchronizedDomainPattern:162ms ForwardCheck:1127ms RestoreRejectedDomains:0ms unassign:0ms total estimation:44ms finish True:5ms All:2638ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Бонус за вільний день для студентів - 47 - 403800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Бонус за вільні дні викладачів - 48 - 1805500
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Бонус за вільний день для студентів - 47 - 402800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Бонус за вільні дні викладачів - 48 - 1814500
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Штраф за більше 3 пар в день - 49 - -1720000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Штраф за вікна між парами для студентів - 50 - -25160
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Штраф за більше 3 пар в день - 49 - -1580000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Штраф за вікна у розкладі викладачів - 51 - -20010
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Штраф за вікна між парами для студентів - 50 - -26310
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Штраф коли група не повністю зайнята на парі - 52 - -71960
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Штраф за вікна у розкладі викладачів - 51 - -21390
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293: Schedule points 372170
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-adf5619b-cd92-489c-afb9-0af5280a1293 (start:5ms next slot:579ms candidateDomains:701ms ValidateAssignment:3ms assign:0ms ApplySynchronizedDomainPattern:140ms ForwardCheck:1055ms RestoreRejectedDomains:0ms unassign:0ms total estimation:44ms finish True:1ms All:2534ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Штраф коли група не повністю зайнята на парі - 52 - -70180
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866: Schedule points 519420
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-018015e6-6313-4838-8556-29336c95a866 (start:18ms next slot:590ms candidateDomains:667ms ValidateAssignment:7ms assign:1ms ApplySynchronizedDomainPattern:171ms ForwardCheck:1115ms RestoreRejectedDomains:0ms unassign:0ms total estimation:47ms finish True:1ms All:2620ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Бонус за вільний день для студентів - 47 - 403900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Бонус за вільні дні викладачів - 48 - 1811400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Бонус за вільний день для студентів - 47 - 400700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Штраф за більше 3 пар в день - 49 - -1820000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Бонус за вільні дні викладачів - 48 - 1816200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Штраф за вікна між парами для студентів - 50 - -27590
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Штраф за більше 3 пар в день - 49 - -1800000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Штраф за вікна у розкладі викладачів - 51 - -19200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Штраф коли група не повністю зайнята на парі - 52 - -72660
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Штраф за вікна між парами для студентів - 50 - -21850
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1: Schedule points 275850
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-6af8666e-0f4c-4ab6-9888-518536acc6d1 (start:1ms next slot:492ms candidateDomains:666ms ValidateAssignment:6ms assign:1ms ApplySynchronizedDomainPattern:136ms ForwardCheck:1098ms RestoreRejectedDomains:0ms unassign:0ms total estimation:40ms finish True:2ms All:2444ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Штраф за вікна у розкладі викладачів - 51 - -18200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Штраф коли група не повністю зайнята на парі - 52 - -72860
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94: Schedule points 303990
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-517c952c-688a-42f0-ba53-f4fdb443eb94 (start:2ms next slot:526ms candidateDomains:650ms ValidateAssignment:8ms assign:1ms ApplySynchronizedDomainPattern:138ms ForwardCheck:965ms RestoreRejectedDomains:0ms unassign:0ms total estimation:49ms finish True:1ms All:2342ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Бонус за вільний день для студентів - 47 - 407400
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Бонус за вільні дні викладачів - 48 - 1820200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Штраф за більше 3 пар в день - 49 - -1840000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Штраф за вікна між парами для студентів - 50 - -30460
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Бонус за вільний день для студентів - 47 - 405800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Штраф за вікна у розкладі викладачів - 51 - -18740
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Бонус за вільні дні викладачів - 48 - 1812300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Штраф коли група не повністю зайнята на парі - 52 - -72980
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8: Schedule points 265420
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-389d3d7f-80a1-42a8-9c30-97e1c92275e8 (start:5ms next slot:701ms candidateDomains:910ms ValidateAssignment:5ms assign:2ms ApplySynchronizedDomainPattern:268ms ForwardCheck:1313ms RestoreRejectedDomains:0ms unassign:0ms total estimation:61ms finish True:2ms All:3270ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Штраф за більше 3 пар в день - 49 - -1780000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Штраф за вікна між парами для студентів - 50 - -22650
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Штраф за вікна у розкладі викладачів - 51 - -18780
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Штраф коли група не повністю зайнята на парі - 52 - -72480
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa: Schedule points 324190
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-49ba5c61-7896-4e69-8adc-0de8da704faa (start:1ms next slot:724ms candidateDomains:923ms ValidateAssignment:3ms assign:2ms ApplySynchronizedDomainPattern:207ms ForwardCheck:1411ms RestoreRejectedDomains:0ms unassign:0ms total estimation:132ms finish True:4ms All:3411ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Бонус за вільний день для студентів - 47 - 405700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Бонус за вільні дні викладачів - 48 - 1830300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Штраф за більше 3 пар в день - 49 - -1460000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Штраф за вікна між парами для студентів - 50 - -31560
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Штраф за вікна у розкладі викладачів - 51 - -23890
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Штраф коли група не повністю зайнята на парі - 52 - -71240
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b: Schedule points 649310
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f96380ae-06b7-4125-81e4-9c03bc228f0b (start:5ms next slot:1323ms candidateDomains:1148ms ValidateAssignment:11ms assign:7ms ApplySynchronizedDomainPattern:335ms ForwardCheck:2356ms RestoreRejectedDomains:0ms unassign:0ms total estimation:152ms finish True:2ms All:5343ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Бонус за вільний день для студентів - 47 - 403900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Бонус за вільні дні викладачів - 48 - 1800800
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Штраф за більше 3 пар в день - 49 - -2060000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Штраф за вікна між парами для студентів - 50 - -25170
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Штраф за вікна у розкладі викладачів - 51 - -15530
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Штраф коли група не повністю зайнята на парі - 52 - -70340
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41: Schedule points 33660
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-7f52ba66-a5f0-44f0-b20e-3ad79a26ad41 (start:5ms next slot:1356ms candidateDomains:1186ms ValidateAssignment:8ms assign:3ms ApplySynchronizedDomainPattern:333ms ForwardCheck:2378ms RestoreRejectedDomains:0ms unassign:0ms total estimation:89ms finish True:1ms All:5363ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Бонус за вільний день для студентів - 47 - 400500
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Бонус за вільні дні викладачів - 48 - 1798100
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Штраф за більше 3 пар в день - 49 - -1460000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Штраф за вікна між парами для студентів - 50 - -26110
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Бонус за вільний день для студентів - 47 - 404300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Бонус за вільні дні викладачів - 48 - 1819300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Штраф за вікна у розкладі викладачів - 51 - -14660
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Штраф коли група не повністю зайнята на парі - 52 - -72360
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e: Schedule points 625470
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-c970f5ed-853a-4b64-877e-8aaaa289bf8e (start:1ms next slot:856ms candidateDomains:678ms ValidateAssignment:4ms assign:5ms ApplySynchronizedDomainPattern:171ms ForwardCheck:1326ms RestoreRejectedDomains:0ms unassign:0ms total estimation:37ms finish True:1ms All:3083ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Штраф за більше 3 пар в день - 49 - -2520000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Штраф за вікна між парами для студентів - 50 - -26490
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Штраф за вікна у розкладі викладачів - 51 - -20860
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Штраф коли група не повністю зайнята на парі - 52 - -73560
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1: Schedule points -417310
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-f2835f28-81f8-4c1a-9b9f-008ef9bd27e1 (start:1ms next slot:835ms candidateDomains:736ms ValidateAssignment:4ms assign:1ms ApplySynchronizedDomainPattern:177ms ForwardCheck:1357ms RestoreRejectedDomains:0ms unassign:0ms total estimation:52ms finish True:2ms All:3170ms)
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Бонус за вільний день для студентів - 47 - 404700
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Бонус за вільні дні викладачів - 48 - 1803200
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Бонус за вільний день для студентів - 47 - 400900
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Бонус за вільні дні викладачів - 48 - 1815300
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Штраф за більше 3 пар в день - 49 - -2180000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Штраф за вікна між парами для студентів - 50 - -26460
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Штраф за більше 3 пар в день - 49 - -1900000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Штраф за вікна між парами для студентів - 50 - -25950
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Штраф за вікна у розкладі викладачів - 51 - -19000
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Штраф за вікна у розкладі викладачів - 51 - -19850
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Штраф коли група не повністю зайнята на парі - 52 - -72020
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Штраф коли група не повністю зайнята на парі - 52 - -72820
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626: Schedule points -89580
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-1fdd7e1b-9e02-4250-8586-70c3a2e0e626 (start:1ms next slot:593ms candidateDomains:777ms ValidateAssignment:4ms assign:1ms ApplySynchronizedDomainPattern:181ms ForwardCheck:1149ms RestoreRejectedDomains:0ms unassign:0ms total estimation:74ms finish True:8ms All:2790ms)
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967: Schedule points 197580
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] alg-285768ee-19bb-4cb6-aecf-7b24d8352967 (start:1ms next slot:638ms candidateDomains:674ms ValidateAssignment:6ms assign:1ms ApplySynchronizedDomainPattern:197ms ForwardCheck:1120ms RestoreRejectedDomains:0ms unassign:0ms total estimation:75ms finish True:2ms All:2717ms)
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] Завершено розрахунку. Кількість успішних результатів: 30, Найкращий результат: 649310
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПОЧАТОК ГЕН АЛГОРИТМУ. КІЛЬКІСТЬ ІТЕРАЦІЙ 200
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №0 МАЄМО: 649310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №1 МАЄМО: 649310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №2 МАЄМО: 649310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №3 МАЄМО: 649310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №4 МАЄМО: 649310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №5 МАЄМО: 649310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Довгай Богдан Валерійович|ДАТА:29.05.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:05.05.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №6 МАЄМО: 649410 | АБО 100 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №7 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №8 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №9 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №10 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №11 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №12 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №13 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №14 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №15 МАЄМО: 649410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Петрушенко Анатолій Миколайович|ДАТА:21.04.2025 00:00:00|НОМЕР:4 СТАЛО:ДАТА:28.04.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №16 МАЄМО: 649520 | АБО 110 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №17 МАЄМО: 649520 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №18 МАЄМО: 649520 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Зінько Тарас Петрович|ДАТА:21.01.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:20.01.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №19 МАЄМО: 649660 | АБО 140 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №20 МАЄМО: 649660 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №21 МАЄМО: 649660 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Гріненко Олена Олександрівна|ДАТА:21.04.2025 00:00:00|НОМЕР:4 СТАЛО:ДАТА:04.03.2025 00:00:00|НОМЕР:2 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №22 МАЄМО: 649790 | АБО 130 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №23 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №24 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №25 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №26 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №27 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №28 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №29 МАЄМО: 649790 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Гагурін Євгеній Русланович|ДАТА:29.01.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:22.01.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №30 МАЄМО: 650190 | АБО 400 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №31 МАЄМО: 650190 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №32 МАЄМО: 650190 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Сенько Іван Олександрович|ДАТА:18.04.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:14.04.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №33 МАЄМО: 690050 | АБО 39860 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №34 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №35 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №36 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №37 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №38 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №39 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №40 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №41 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №42 МАЄМО: 690050 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Петрушенко Анатолій Миколайович|ДАТА:21.01.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:21.04.2025 00:00:00|НОМЕР:1 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №43 МАЄМО: 690150 | АБО 100 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Гріненко Олена Олександрівна|ДАТА:21.04.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:11.02.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №44 МАЄМО: 690240 | АБО 90 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №45 МАЄМО: 690240 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Лівінська Ганна Володимирівна|ДАТА:10.02.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:29.04.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №46 МАЄМО: 690380 | АБО 140 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №47 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №48 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №49 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №50 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №51 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №52 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №53 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №54 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №55 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №56 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №57 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №58 МАЄМО: 690380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Катеринич Лариса Олександрівна|ДАТА:22.01.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:23.01.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №59 МАЄМО: 690800 | АБО 420 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №60 МАЄМО: 690800 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №61 МАЄМО: 690800 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №62 МАЄМО: 690800 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №63 МАЄМО: 690800 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №64 МАЄМО: 690800 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №65 МАЄМО: 690800 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Марціленко Іван Володимирович|ДАТА:20.01.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:20.01.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №66 МАЄМО: 690940 | АБО 140 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №67 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №68 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №69 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №70 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №71 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №72 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №73 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №74 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №75 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №76 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №77 МАЄМО: 690940 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Кузнєцов Владислав Олександрович|ДАТА:24.01.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:23.01.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №78 МАЄМО: 691150 | АБО 210 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №79 МАЄМО: 691150 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №80 МАЄМО: 691150 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №81 МАЄМО: 691150 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №82 МАЄМО: 691150 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №83 МАЄМО: 691150 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №84 МАЄМО: 691150 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Пашко Анатолій Олексійович|ДАТА:05.03.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:06.03.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №85 МАЄМО: 831430 | АБО 140280 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №86 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №87 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №88 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №89 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №90 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №91 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №92 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №93 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №94 МАЄМО: 831430 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Шишацька Олена Володимирівна|ДАТА:21.01.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:21.01.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №95 МАЄМО: 831550 | АБО 120 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №96 МАЄМО: 831550 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №97 МАЄМО: 831550 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №98 МАЄМО: 831550 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №99 МАЄМО: 831550 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №100 МАЄМО: 831550 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №101 МАЄМО: 831550 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Мельник  Анастасія  Олександрівна|ДАТА:21.01.2025 00:00:00|НОМЕР:4 СТАЛО:ДАТА:21.01.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №102 МАЄМО: 831560 | АБО 10 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №103 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №104 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №105 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №106 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №107 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №108 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №109 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №110 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №111 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №112 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №113 МАЄМО: 831560 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Ількун Олександр  Петрович|ДАТА:23.01.2025 00:00:00|НОМЕР:4 СТАЛО:ДАТА:23.01.2025 00:00:00|НОМЕР:1 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №114 МАЄМО: 832180 | АБО 620 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Іксанов Олександр Маратович|ДАТА:21.05.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:21.05.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №115 МАЄМО: 832270 | АБО 90 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №116 МАЄМО: 832270 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Кривий Сергій Лук"янович|ДАТА:07.05.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:22.05.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №117 МАЄМО: 832370 | АБО 100 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Нікітченко Микола Степанович|ДАТА:22.01.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:12.03.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №118 МАЄМО: 832440 | АБО 70 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №119 МАЄМО: 832440 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №120 МАЄМО: 832440 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Ніколенко О.В.|ДАТА:02.05.2025 00:00:00|НОМЕР:4 СТАЛО:ДАТА:30.04.2025 00:00:00|НОМЕР:1 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №121 МАЄМО: 832470 | АБО 30 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №122 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №123 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №124 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №125 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №126 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №127 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №128 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №129 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №130 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №131 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №132 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №133 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №134 МАЄМО: 832470 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Зінько Тарас Петрович|ДАТА:23.01.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:23.01.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №135 МАЄМО: 833030 | АБО 560 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №136 МАЄМО: 833030 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Пономарьов Вадим Дмитрович|ДАТА:06.03.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:04.03.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №137 МАЄМО: 971310 | АБО 138280 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №138 МАЄМО: 971310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №139 МАЄМО: 971310 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Семенова Наталія Володимирівна|ДАТА:28.04.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:14.04.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №140 МАЄМО: 971380 | АБО 70 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №141 МАЄМО: 971380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №142 МАЄМО: 971380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №143 МАЄМО: 971380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №144 МАЄМО: 971380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №145 МАЄМО: 971380 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Пашко Анатолій Олексійович|ДАТА:06.03.2025 00:00:00|НОМЕР:4 СТАЛО:ДАТА:07.03.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №146 МАЄМО: 1051270 | АБО 79890 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №147 МАЄМО: 1051270 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №148 МАЄМО: 1051270 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №149 МАЄМО: 1051270 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Дороніна Н.В.|ДАТА:20.01.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:28.02.2025 00:00:00|НОМЕР:1 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №150 МАЄМО: 1051320 | АБО 50 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №151 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №152 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №153 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №154 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №155 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №156 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №157 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №158 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №159 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №160 МАЄМО: 1051320 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Гринюк С.П.|ДАТА:21.05.2025 00:00:00|НОМЕР:3 СТАЛО:ДАТА:31.01.2025 00:00:00|НОМЕР:3 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №161 МАЄМО: 1051400 | АБО 80 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №162 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №163 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №164 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №165 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №166 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №167 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №168 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №169 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №170 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №171 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №172 МАЄМО: 1051400 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Сторожук С.В.|ДАТА:21.02.2025 00:00:00|НОМЕР:2 СТАЛО:ДАТА:29.04.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №173 МАЄМО: 1051410 | АБО 10 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №174 МАЄМО: 1051410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №175 МАЄМО: 1051410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №176 МАЄМО: 1051410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №177 МАЄМО: 1051410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №178 МАЄМО: 1051410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №179 МАЄМО: 1051410 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Ліндер Ярослав Миколайович|ДАТА:27.01.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:20.01.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №180 МАЄМО: 1051450 | АБО 40 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №181 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №182 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №183 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №184 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №185 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №186 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №187 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №188 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №189 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №190 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №191 МАЄМО: 1051450 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: ВИКЛАДАЧ:Кулян Віктор Романович|ДАТА:14.03.2025 00:00:00|НОМЕР:1 СТАЛО:ДАТА:14.03.2025 00:00:00|НОМЕР:4 
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №192 МАЄМО: 1051480 | АБО 30 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №193 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №194 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №195 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №196 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №197 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №198 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ПІСЛЯН МУТ. №199 МАЄМО: 1051480 | АБО 0 ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] ДО АЛГОРИМУ: 649310 ПІСЛЯ АЛГОРИТМУ 1051480
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] МИ ЗРОБИЛИ КРАЩЕ НА 402170, АБО У: 1,6193805732238837 РАЗ
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] БУЛО: 649310
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] СТАЛО: 1051480
+info: AcaTime.ScheduleGenerator.Services.ScheduleDataClient[0] Збереження розкладу Genetic з 1051480 балами...
+info: AcaTime.ScheduleGenerator.Services.ScheduleDataClient[0] Розклад збережено
+info: AcaTime.ScheduleGenerator.Services.ScheduleDataClient[0] Збереження розкладу Default з 649310 балами...
+info: AcaTime.ScheduleGenerator.Services.ScheduleDataClient[0] Розклад збережено
+info: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] Збережено 2 варіантів розкладу
+dbug: AcaTime.ScheduleCommon.Services.ScheduleBuilderService[0] schedule (load:2ms calculate:193474ms save:2970ms All:196447ms)
+info: AcaTime.ScheduleGenerator.Services.ScheduleGeneratorHost[0] Роботу завершено
+
+Process finished with exit code 0.
+
+
+
+
+
+
+
+
