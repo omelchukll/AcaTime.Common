@@ -1,6 +1,6 @@
-﻿using AcaTime.Algorithm.Second.Models;
-using AcaTime.Algorithm.Second.Services.Calc;
-using AcaTime.Algorithm.Second.Utils;
+﻿using AcaTime.Algorithm.Alternative.Models;
+using AcaTime.Algorithm.Alternative.Services.Calc;
+using AcaTime.Algorithm.Alternative.Utils;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
 using AcaTime.ScheduleCommon.Utils;
@@ -11,19 +11,19 @@ using System.ComponentModel.Design.Serialization;
 using System.Net.Security;
 using System.Runtime.CompilerServices;
 
-namespace AcaTime.Algorithm.Second.Services
+namespace AcaTime.Algorithm.Alternative.Services
 {
 
     /// <summary>
     /// Клас для реалізації алгоритму розкладу.
     /// </summary>
-    public class SecondScheduleAlgorithmUnit
+    public class AlternativeScheduleAlgorithmUnit
     {
         /// <summary>
         /// Дані для розкладу
         /// </summary>
         public FacultySeasonDTO Root { get; private set; }
-        
+
         /// <summary>
         /// Оцінки для розкладу
         /// </summary>
@@ -85,131 +85,8 @@ namespace AcaTime.Algorithm.Second.Services
         }
 
 
-        #region Генетичний алгоритм
-
-        
-        private void Calculate()
-        {
-            // estimation before genetic algorithm
-            // Estimate();
-            
-            var assignedSlots = Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
-            var allSlots = Slots.Values.Select(x => x.ScheduleSlot).ToList();
-            var input = Root;
-            
-            
-            
-            // var initialPopulation = Slots;
-            var cacheRoot = this.Clone();
-            // var data = this.Clone();
-            var initialPopulation = Slots;
-            
-            var maxGenerations = 20;
-            for (var gen = 0; gen < maxGenerations; gen++)
-            {
-                var newPopulation = initialPopulation.ToDictionary(x => x.Key, x => x.Value);
-                
-                // lets try mutation
-                initialPopulation = Mutations(newPopulation);
-            }
-            // estimation after genetic algorithm
-            var res = Estimate(this);
-            var resCache = Estimate(cacheRoot);
-            logger.LogInformation($"Before genetic algorithm: {initialResult.TotalEstimation}");
-            logger.LogInformation($"Before genetic algorithm resCache: {resCache.TotalEstimation}");
-            logger.LogInformation($"After genetic algorithm: {res.TotalEstimation}");
-            if (res.TotalEstimation > initialResult.TotalEstimation)
-            {
-                logger.LogInformation("WE MADE IT BETTER!");
-                initialResult = res;
-            }
-            // lets try assigning it anyway
-            // initialResult = res;
-        }
-
-        private readonly Random _random = new();
-        private Dictionary<IScheduleSlot, SlotTracker> Mutations(Dictionary<IScheduleSlot, SlotTracker> population)
-        {
-            var randomEl = population.ElementAt(_random.Next(population.Count));
-            var slot = (ScheduleSlotDTO) randomEl.Key;
-            var val = randomEl.Value;
-            
-            // PrevVal
-            var before = EstimateSlot(val);
-            var cacheDate = val.ScheduleSlot.Date;
-            var cachePair = val.ScheduleSlot.PairNumber;
-            
-            var assignedSlots = GetAssignedSlots();
-            // List<DomainValue> candidateDomains = GetSortedDomains(val, assignedSlots);
-            var availableDomains = val.AvailableDomains;
-            
-            var change = availableDomains.ElementAt(_random.Next(availableDomains.Count));
-            // var change = candidateDomains.ElementAt(_random.Next(candidateDomains.Count));
-            
-            ResetUnAssignedFirstSlots(val);
-            bool isValid = ValidateAssignment(val, change, assignedSlots);
-
-            if (isValid)
-            {
-                SetSlotAssigned(val, change, val.AssignStep);
-                var syncCheck = ApplySynchronizedDomainPattern(val, assignedSlots);
-                if (syncCheck)
-                {
-                    ForwardCheck(val, val.AssignStep);
-                    
-                    
-                    // if the mutation made it better, save the result
-                    var res = Estimate(this);
-                }
-            }
-
-            return population;
-
-            // val.ScheduleSlot.Date = change.Date;
-            // val.ScheduleSlot.PairNumber = change.PairNumber;
-            // val.AvailableDomains = new SortedSet<DomainValue>(availableDomains.Where(x => x != change));
-
-            // ApplySynchronizedDomainPattern(val, assignedSlots);
-
-            // var after = EstimateSlot(val);
-            // if (!isValid)
-            // {
-            //     val.ScheduleSlot.Date = cacheDate;
-            //     val.ScheduleSlot.PairNumber = cachePair;
-            // }
-
-
-        }
-        
-        private AlgorithmResultDTO Estimate(SecondScheduleAlgorithmUnit data)
-        {
-            int scheduleEstimation = 0;
-            foreach (var s in UserFunctions.ScheduleEstimations)
-            {
-                var extScore = s.Estimate(data.Root);
-                logger.LogDebug($"{algorithmName}: {s.Name} - {s.Id} - {extScore}");
-                scheduleEstimation += extScore;
-            }
-
-            DebugData.Step("GENETIC: total estimation");
-
-            var res = new AlgorithmResultDTO();
-            res.TotalEstimation = scheduleEstimation;
-            res.ScheduleSlots = Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
-            res.Name = algorithmName;
-            
-            CheckResult(res);
-
-            logger.LogInformation($"{algorithmName}: ESTIMATION: Schedule points {scheduleEstimation}");
-            return res;
-        }
-        
-
-        #endregion
-
         #region Основні функції алгоритму
 
-        private AlgorithmResultDTO initialResult = null;
         /// <summary>
         /// Виконання алгоритму.
         /// </summary>
@@ -242,7 +119,7 @@ namespace AcaTime.Algorithm.Second.Services
             var res = new AlgorithmResultDTO();
             if (success)
             {
-                // ButifyResult();
+                ButifyResult();
 
 
                 int scheduleEstimation = 0;
@@ -259,35 +136,18 @@ namespace AcaTime.Algorithm.Second.Services
                 res.ScheduleSlots = Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
                 res.Name = algorithmName;
 
-                initialResult = res;
-
                 CheckResult(res);
 
-                logger.LogInformation($"{algorithmName}: INITIAL: Schedule points {scheduleEstimation}");
-                
-                // для того щоб зберегти початковий результат, клонуємо його.
-                var cacheRoot = this.Clone();
-                int scheduleEst = 0;
-                foreach (var s in UserFunctions.ScheduleEstimations)
-                {
-                    var extScore = s.Estimate(cacheRoot.Root);
-                    // logger.LogDebug($"{algorithmName}: {s.Name} - {s.Id} - {extScore}");
-                    scheduleEst += extScore;
-                }
-                logger.LogInformation($"{algorithmName}: CLONE: Schedule points {scheduleEst}");
-
-                
-                // спробуємо генетичний алгоритм
-                Calculate();
+                logger.LogInformation($"{algorithmName}: Schedule points {scheduleEstimation}");
             }
 
             DebugData.Step($"finish {success}");
             logger.LogInformation(DebugData.ToString());
-            
 
-            return success ? initialResult : null;
+            return success ? res : null;
         }
-
+        
+        
         /// <summary>
         /// Рекурсивний метод призначення доменних значень для всіх слотів.
         /// </summary>
@@ -566,13 +426,13 @@ namespace AcaTime.Algorithm.Second.Services
             if (!standartValidation)
                 return false;
 
-            // // Перевірка на аудиторії, якщо алгоритм має враховувати їх
-            // if (!ignoreClassrooms && !slotTracker.ScheduleSlot.GroupSubject.Subject.NoClassroom)
-            // {
-            //     var classroomValidation = ValidateAndSelectClassroom(slotTracker.ScheduleSlot, domain, assignedSLots);
-            //     if (!classroomValidation)
-            //         return false;
-            // }
+            // Перевірка на аудиторії, якщо алгоритм має враховувати їх
+            if (!ignoreClassrooms && !slotTracker.ScheduleSlot.GroupSubject.Subject.NoClassroom)
+            {
+                var classroomValidation = ValidateAndSelectClassroom(slotTracker.ScheduleSlot, domain, assignedSLots);
+                if (!classroomValidation)
+                    return false;
+            }
 
             foreach (var validator in UserFunctions.SlotValidators)
             {
@@ -584,110 +444,110 @@ namespace AcaTime.Algorithm.Second.Services
             return true;
         }
 
-        // /// <summary>
-        // /// Перевіряє, чи є доступні аудиторії для даного слоту у вказаний час і вибирає найкращу
-        // /// </summary>
-        // /// <param name="slot">Слот розкладу</param>
-        // /// <param name="domain">Доменне значення (дата і номер пари)</param>
-        // /// <param name="assignedSLots">Вже призначені слоти</param>
-        // /// <returns>true, якщо є доступні аудиторії, false - якщо немає</returns>
-        // private bool ValidateAndSelectClassroom(ScheduleSlotDTO slot, DomainValue domain, IAssignedSlots assignedSLots)
-        // {
-        //     // Якщо предмет не потребує аудиторії, перевірка не потрібна
-        //     if (ignoreClassrooms || slot.GroupSubject.Subject.NoClassroom)
-        //         return true;
-        //
-        //     // Кількість студентів, для яких потрібна аудиторія
-        //     int requiredStudentCount = slot.GroupSubject.StudentCount;
-        //
-        //     // Отримання списку підходящих аудиторій за типом
-        //     var requiredClassroomTypes = slot.GroupSubject.Subject.ClassroomTypes
-        //         .Select(ct => ct.ClassroomTypeId)
-        //         .ToHashSet();
-        //
-        //     // Отримуємо пріоритетний тип аудиторії, враховуючи сортування в ClassroomTypes згідно приоритету
-        //     var priorityClassroomTypeId = slot.GroupSubject.Subject.ClassroomTypes.FirstOrDefault()?.ClassroomTypeId;
-        //
-        //     if (priorityClassroomTypeId == null)
-        //         throw new Exception($"Не вказаний тип аудиторії для предмету {slot.GroupSubject.Subject.Name}");
-        //
-        //     // Фільтр для аудиторій, які підходять за типом та розміром
-        //     var filterLambda = (ClassroomDTO x) => x.StudentCount >= requiredStudentCount && x.ClassroomTypes.Any(ct => requiredClassroomTypes.Contains(ct.ClassroomTypeId));
-        //
-        //     // Стандартний жадібний метод
-        //     var freeClassrooms = (assignedClassrooms.ContainsKey(domain.Date) && assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber))
-        //         ? Root.Classrooms.Where(x => !assignedClassrooms[domain.Date][domain.PairNumber].ContainsKey(x) && filterLambda(x))
-        //         : Root.Classrooms.Where(filterLambda);
-        //
-        //     // Сортування аудиторій за пріоритетом
-        //     var sortLambda = (ClassroomDTO x) =>
-        //     {
-        //         if (x.ClassroomTypes.First().ClassroomTypeId == priorityClassroomTypeId)
-        //             return 1000000;
-        //         if (requiredClassroomTypes.Contains(x.ClassroomTypes.First().ClassroomTypeId))
-        //             return 1000;
-        //         return 100;
-        //     };
-        //
-        //     // Вибір найкращої аудиторії
-        //     var classrooms = freeClassrooms.OrderByDescending(x => sortLambda(x)).ThenBy(x => x.StudentCount).FirstOrDefault();
-        //
-        //     // Якщо жадібний алгоритм знайшов аудиторію, використовуємо її
-        //     if (classrooms != null)
-        //     {
-        //         // Призначаємо аудиторію
-        //         slot.Classroom = classrooms;
-        //         return true;
-        //     }
-        //
-        //     // Якщо жадібний алгоритм не знайшов аудиторію, спробуємо використати алгоритм Хопкрофта-Карпа
-        //     // для оптимального перерозподілу аудиторій
-        //     return TryReallocateClassroomsWithHopcroftKarp(slot, domain);
-        // }
+        /// <summary>
+        /// Перевіряє, чи є доступні аудиторії для даного слоту у вказаний час і вибирає найкращу
+        /// </summary>
+        /// <param name="slot">Слот розкладу</param>
+        /// <param name="domain">Доменне значення (дата і номер пари)</param>
+        /// <param name="assignedSLots">Вже призначені слоти</param>
+        /// <returns>true, якщо є доступні аудиторії, false - якщо немає</returns>
+        private bool ValidateAndSelectClassroom(ScheduleSlotDTO slot, DomainValue domain, IAssignedSlots assignedSLots)
+        {
+            // Якщо предмет не потребує аудиторії, перевірка не потрібна
+            if (ignoreClassrooms || slot.GroupSubject.Subject.NoClassroom)
+                return true;
 
-        // /// <summary>
-        // /// Намагається перерозподілити аудиторії за допомогою алгоритму Хопкрофта-Карпа
-        // /// </summary>
-        // /// <param name="slot">Слот, для якого потрібна аудиторія</param>
-        // /// <param name="domain">Доменне значення (дата і номер пари)</param>
-        // /// <returns>true, якщо вдалося призначити аудиторію, false - якщо ні</returns>
-        // private bool TryReallocateClassroomsWithHopcroftKarp(ScheduleSlotDTO slot, DomainValue domain)
-        // {
-        //     // Якщо немає призначених аудиторій або немає потреби в аудиторії, виходимо
-        //     if (!assignedClassrooms.ContainsKey(domain.Date) ||
-        //         !assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber) ||
-        //         slot.GroupSubject.Subject.NoClassroom)
-        //         return false;
-        //
-        //     // Збираємо всі слоти, включаючи поточний, для яких потрібно призначити аудиторії
-        //     var slotsWithClassrooms = new List<ScheduleSlotDTO>(
-        //         assignedClassrooms[domain.Date][domain.PairNumber].Values);
-        //     slotsWithClassrooms.Add(slot);
-        //
-        //     // Виконуємо алгоритм Хопкрофта-Карпа для пошуку оптимального розподілу
-        //     var bipartiteMatching = HopcroftKarpAlgorithm.FindOptimalClassroomAssignment(slotsWithClassrooms, Root.Classrooms);
-        //
-        //     // Якщо знайдено розподіл і в ньому є поточний слот
-        //     if (bipartiteMatching != null && bipartiteMatching.ContainsKey(slot) && bipartiteMatching.Count == slotsWithClassrooms.Count)
-        //     {
-        //         // Тимчасово запам'ятовуємо призначення для нового слоту
-        //         var assignedClassroom = bipartiteMatching[slot];
-        //
-        //         // Не застосовуємо зміни одразу, лише призначаємо аудиторію для поточного слоту
-        //         slot.Classroom = assignedClassroom;
-        //
-        //         assignedClassrooms[domain.Date][domain.PairNumber] = new Dictionary<ClassroomDTO, ScheduleSlotDTO>();
-        //
-        //         foreach (var pair in bipartiteMatching.Where(x => x.Key != slot))
-        //         {
-        //             assignedClassrooms[domain.Date][domain.PairNumber][pair.Value] = pair.Key;
-        //             pair.Key.Classroom = pair.Value;
-        //         }
-        //
-        //         return true;
-        //     }
-        //     return false;
-        // }
+            // Кількість студентів, для яких потрібна аудиторія
+            int requiredStudentCount = slot.GroupSubject.StudentCount;
+
+            // Отримання списку підходящих аудиторій за типом
+            var requiredClassroomTypes = slot.GroupSubject.Subject.ClassroomTypes
+                .Select(ct => ct.ClassroomTypeId)
+                .ToHashSet();
+
+            // Отримуємо пріоритетний тип аудиторії, враховуючи сортування в ClassroomTypes згідно приоритету
+            var priorityClassroomTypeId = slot.GroupSubject.Subject.ClassroomTypes.FirstOrDefault()?.ClassroomTypeId;
+
+            if (priorityClassroomTypeId == null)
+                throw new Exception($"Не вказаний тип аудиторії для предмету {slot.GroupSubject.Subject.Name}");
+
+            // Фільтр для аудиторій, які підходять за типом та розміром
+            var filterLambda = (ClassroomDTO x) => x.StudentCount >= requiredStudentCount && x.ClassroomTypes.Any(ct => requiredClassroomTypes.Contains(ct.ClassroomTypeId));
+
+            // Стандартний жадібний метод
+            var freeClassrooms = (assignedClassrooms.ContainsKey(domain.Date) && assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber))
+                ? Root.Classrooms.Where(x => !assignedClassrooms[domain.Date][domain.PairNumber].ContainsKey(x) && filterLambda(x))
+                : Root.Classrooms.Where(filterLambda);
+
+            // Сортування аудиторій за пріоритетом
+            var sortLambda = (ClassroomDTO x) =>
+            {
+                if (x.ClassroomTypes.First().ClassroomTypeId == priorityClassroomTypeId)
+                    return 1000000;
+                if (requiredClassroomTypes.Contains(x.ClassroomTypes.First().ClassroomTypeId))
+                    return 1000;
+                return 100;
+            };
+
+            // Вибір найкращої аудиторії
+            var classrooms = freeClassrooms.OrderByDescending(x => sortLambda(x)).ThenBy(x => x.StudentCount).FirstOrDefault();
+
+            // Якщо жадібний алгоритм знайшов аудиторію, використовуємо її
+            if (classrooms != null)
+            {
+                // Призначаємо аудиторію
+                slot.Classroom = classrooms;
+                return true;
+            }
+
+            // Якщо жадібний алгоритм не знайшов аудиторію, спробуємо використати алгоритм Хопкрофта-Карпа
+            // для оптимального перерозподілу аудиторій
+            return TryReallocateClassroomsWithHopcroftKarp(slot, domain);
+        }
+
+        /// <summary>
+        /// Намагається перерозподілити аудиторії за допомогою алгоритму Хопкрофта-Карпа
+        /// </summary>
+        /// <param name="slot">Слот, для якого потрібна аудиторія</param>
+        /// <param name="domain">Доменне значення (дата і номер пари)</param>
+        /// <returns>true, якщо вдалося призначити аудиторію, false - якщо ні</returns>
+        private bool TryReallocateClassroomsWithHopcroftKarp(ScheduleSlotDTO slot, DomainValue domain)
+        {
+            // Якщо немає призначених аудиторій або немає потреби в аудиторії, виходимо
+            if (!assignedClassrooms.ContainsKey(domain.Date) ||
+                !assignedClassrooms[domain.Date].ContainsKey(domain.PairNumber) ||
+                slot.GroupSubject.Subject.NoClassroom)
+                return false;
+
+            // Збираємо всі слоти, включаючи поточний, для яких потрібно призначити аудиторії
+            var slotsWithClassrooms = new List<ScheduleSlotDTO>(
+                assignedClassrooms[domain.Date][domain.PairNumber].Values);
+            slotsWithClassrooms.Add(slot);
+
+            // Виконуємо алгоритм Хопкрофта-Карпа для пошуку оптимального розподілу
+            var bipartiteMatching = HopcroftKarpAlgorithm.FindOptimalClassroomAssignment(slotsWithClassrooms, Root.Classrooms);
+
+            // Якщо знайдено розподіл і в ньому є поточний слот
+            if (bipartiteMatching != null && bipartiteMatching.ContainsKey(slot) && bipartiteMatching.Count == slotsWithClassrooms.Count)
+            {
+                // Тимчасово запам'ятовуємо призначення для нового слоту
+                var assignedClassroom = bipartiteMatching[slot];
+
+                // Не застосовуємо зміни одразу, лише призначаємо аудиторію для поточного слоту
+                slot.Classroom = assignedClassroom;
+
+                assignedClassrooms[domain.Date][domain.PairNumber] = new Dictionary<ClassroomDTO, ScheduleSlotDTO>();
+
+                foreach (var pair in bipartiteMatching.Where(x => x.Key != slot))
+                {
+                    assignedClassrooms[domain.Date][domain.PairNumber][pair.Value] = pair.Key;
+                    pair.Key.Classroom = pair.Value;
+                }
+
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Оцінка слоту для вибору як наступного слоту в розподілі.
@@ -718,18 +578,18 @@ namespace AcaTime.Algorithm.Second.Services
             return score;
         }
 
-        // /// <summary>
-        // /// Спроба перерозподілити аудиторії для серій
-        // /// </summary>
-        // /// <exception cref="Exception"></exception>
-        // private void ButifyResult()
-        // {
-        //     if (!this.ignoreClassrooms)
-        //     {
-        //         ClassroomReassignmentService classroomReassignmentService = new ClassroomReassignmentService(logger, Root.Classrooms, Slots.Values.Where(s => s.IsAssigned).Select(s => s.ScheduleSlot).ToList());
-        //         classroomReassignmentService.ButifyResult();
-        //     }
-        // }
+        /// <summary>
+        /// Спроба перерозподілити аудиторії для серій
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void ButifyResult()
+        {
+            if (!this.ignoreClassrooms)
+            {
+                ClassroomReassignmentService classroomReassignmentService = new ClassroomReassignmentService(logger, Root.Classrooms, Slots.Values.Where(s => s.IsAssigned).Select(s => s.ScheduleSlot).ToList());
+                classroomReassignmentService.ButifyResult();
+            }
+        }
 
 
         /// <summary>

@@ -56,3 +56,6 @@ _ReSharper*/
 
 ## Ігнорування тестових результатів
 TestResults/ 
+
+## Ігнорування Rider/Idea
+.idea/

@@ -1,26 +1,30 @@
-﻿using AcaTime.Algorithm.Default.Models;
-using AcaTime.Algorithm.Default.Utils;
+﻿using System.Collections.Concurrent;
+using AcaTime.Algorithm.Genetic.Models;
+using AcaTime.Algorithm.Genetic.Utils;
 using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
 using AcaTime.ScriptModels;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 
-namespace AcaTime.Algorithm.Default.Services
+namespace AcaTime.Algorithm.Genetic.Services
 {
     /// <summary>
     /// Алгоритм побудови розкладу
     /// </summary>
-    public class DefaultScheduleAlgorithm : IScheduleAlgorithm
+    public class GeneticScheduleAlgorithm : IScheduleAlgorithm
     {
         public AlgorithmParams RunParameters { get; private set; }
         public DateTime StartTime { get; private set; }
 
-        DefaultScheduleAlgorithmUnit defaultUnit;
+        // GeneticScheduleAlgorithmUnit defaultUnit;
+        GeneticScheduleAlgorithmUnit defaultUnit;
+        
         private ILogger logger;
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
-        
+
+        private GeneticScheduleAlgorithmUnit savedUnit;
+
         public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default)
         {
             this.logger = logger;
@@ -30,7 +34,10 @@ namespace AcaTime.Algorithm.Default.Services
             this.RunParameters = runParameters;
             this.StartTime = DateTime.Now;
 
-            defaultUnit = new DefaultScheduleAlgorithmUnit();
+            // defaultUnit = new GeneticScheduleAlgorithmUnit();
+            // defaultUnit.Setup(root, logger, userFunctions, runParameters);
+            
+            defaultUnit = new GeneticScheduleAlgorithmUnit();
             defaultUnit.Setup(root, logger, userFunctions, runParameters);
 
             await Load();
@@ -50,11 +57,11 @@ namespace AcaTime.Algorithm.Default.Services
             var results = new ConcurrentBag<AlgorithmResultDTO>();
             ParallelOptions parallelOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount > 4 ? Environment.ProcessorCount / 2 : 1,
+                MaxDegreeOfParallelism = Environment.ProcessorCount > 4 ? Environment.ProcessorCount / 4 : 1,
                 CancellationToken = linkedCts.Token
             };
 
-            // time for one itteration
+            // time for one iteration
             var timeOneSec = runParameters.TimeoutInSeconds * parallelOptions.MaxDegreeOfParallelism / runParameters.MaxIterations;
 
             statistics = new AlgorithmStatistics();
@@ -65,28 +72,43 @@ namespace AcaTime.Algorithm.Default.Services
 
                 logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
                 await Parallel.ForEachAsync(
+                    // Enumerable.Range(0, 1),
+                    // Enumerable.Range(0, 1),
                     Enumerable.Range(0, runParameters.MaxIterations),
-                    // Enumerable.Range(0, runParameters.MaxIterations),
                     parallelOptions,
                     async (i, token) =>
                     {
+                        // var unit = defaultUnit.Clone();
                         var unit = defaultUnit.Clone();
 
-                        // set timeout for one itteration
+                        // set timeout for one iteration
                         var timeoutOneCts = new CancellationTokenSource();
                         var linkedOneCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutOneCts.Token, token);
 
                         timeoutOneCts.CancelAfter(TimeSpan.FromSeconds(timeOneSec));
 
-                        var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
+                        // var res = await unit.Run(root, userFunctions, null, ignoreClassrooms, logger, linkedOneCts.Token);
+                        // var result = res.Count != 0 ? res[0] : null;
 
+                        
+                        var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
+                        
                         if (result != null)
                         {
                             lock (results)
                             {
                                 statistics.Success++;
-                                result.Name = this.GetName();
+                                result.Name = "Default";
                                 results.Add(result);
+                                if (savedUnit == null)
+                                {
+                                    savedUnit = unit;
+                                }
+
+                                if (result.TotalEstimation > savedUnit.Estimate())
+                                {
+                                    savedUnit = unit;
+                                }
                                 // Сортуємо та обмежуємо кількість результатів при необхідності
                                 if (results.Count > runParameters.ResultsCount)
                                 {
@@ -114,17 +136,46 @@ namespace AcaTime.Algorithm.Default.Services
             }
 
             logger.LogInformation($"Завершено розрахунку. Кількість успішних результатів: {statistics.Success}, Найкращий результат: {statistics.BestResult}");
-
+            
             // Повертаємо найкращі результати
             var res = results
                 .OrderByDescending(x => x.TotalEstimation)
                 .Take(runParameters.ResultsCount)
                 .ToList();
 
+            if (res.Count > 0)
+            {
+                var result = res[0];
+                
+                var defaultResultUnit = savedUnit.CloneWithPrivateCache();
+                result.ScheduleSlots = defaultResultUnit.Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
+
+                var defaultResult = res[0];
+                
+                var unit = savedUnit.CloneWithPrivateCache();
+                // var unit = defaultUnit.Clone();
+                unit.initialResult = new AlgorithmResultDTO();
+                
+                logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. DEFAULT RESULT: {defaultResult.TotalEstimation}");
+                logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. GENETIC START: {unit.initialResult.TotalEstimation}");
+
+                var before = defaultResult.TotalEstimation;
+                
+                Calculate(unit);
+                    
+                var after = unit.initialResult.TotalEstimation;
+                logger.LogInformation($"БУЛО: {before}");
+                logger.LogInformation($"СТАЛО: {after}");
+
+                if (after > before)
+                {
+                    res.Insert(0, unit.initialResult);
+                }
+            }
+
             return res;
         }      
-
-
+        
         /// <summary>
         /// Отримує статистику роботи алгоритму
         /// </summary>
@@ -157,6 +208,7 @@ namespace AcaTime.Algorithm.Default.Services
             }
             return slots;
         }
+
 
         /// <summary>
         /// Виконуємо крокі які спільні для всіх юнітів. Підготавлюємо кеш.
@@ -254,7 +306,7 @@ namespace AcaTime.Algorithm.Default.Services
                         continue;
 
                     // Визначаємо тип розбиття (щотижневий або через тиждень)
-                    int weekShift = series.SplitType == ScriptModels.SubjectSeriesSplitType.Weekly ? 1 : 2;
+                    int weekShift = series.SplitType == AcaTime.ScriptModels.SubjectSeriesSplitType.Weekly ? 1 : 2;
                     
                     // Додаємо слоти до серії
                     var currentSeries = trackers.GetRange(trackerIndex, slotsToTake);
@@ -595,7 +647,7 @@ namespace AcaTime.Algorithm.Default.Services
 
         public string GetName()
         {
-           return "Default";
+           return "Genetic";
         }
 
         /// <summary>
@@ -661,8 +713,116 @@ namespace AcaTime.Algorithm.Default.Services
                     DataType = AlgorithmParameterType.Decimal,
                     DefaultValue = "1",
                     IsRequired = false
+                },
+                // для ген алгоритму
+                new AlgorithmParameterDTO
+                {
+                    Name = "GeneticIterations",
+                    Description = "Кількість ітерацій",
+                    DataType = AlgorithmParameterType.Decimal,
+                    DefaultValue = "100",
+                    IsRequired = false
                 }
             };
         }
+
+        #region genetic
+        
+        // todo: Переробити для паралельного виконання
+        // або можливо не варто виконувати весь алгоритм паралельно,
+        // оскільки юніт = популяція, можна викликати самі операції паралельно і дивитись яка з них показує кращий результат,
+        // зберігаючи найкращий юніт
+        private void Calculate(GeneticScheduleAlgorithmUnit unit)
+        {
+            // Збережемо 
+            // var cacheRoot = unit.CloneWithPrivateCache();
+            
+            // на 100 ітерацій, більшість успішних мутацій в сумі дадуть +1-2%, але в середньому є 2-3 такі мутації що дадуть +5-6%.
+            // коли зможемо прискорити виконання, можна буде використати більшу кількість ітерацій
+            // +краще поки не ставити більше 100-120, бо при 100+ буває що не зберігається розклад (подивитись в чому може бути проблема, можливо при перевірці на валідність нового призначення не врахувалось закінчення семестру?)
+            // upd наче розібрався?
+            // UDP на 150-200 ітерацій виходить навіть +10-15%
+            // Це добре що номільнально оцінка стає краще, але треба детально роздивлятись excel файли. Роздивившись, можу сказати що десь ці зміни мають певний сенс, як такий альтернативний погляд, люфт
+            // var maxGenerations = 100;
+            // var maxGenerations = 150;
+            var maxGenerations = RunParameters.GeneticIterations;
+            logger.LogInformation($"ПОЧАТОК ГЕН АЛГОРИТМУ. КІЛЬКІСТЬ ІТЕРАЦІЙ {maxGenerations}");
+
+            var initEstimate = unit.Estimate();
+            
+            var baseEstimate = unit.Estimate();
+
+            for (var gen = 0; gen < maxGenerations; gen++)
+            {
+                var estimation = 0;
+                var e = unit.Estimate();
+                
+                for(var i = 0; i < 1; i++)
+                    estimation = unit.Mutations(e);
+                // Зараз виконуємо лише мутації, оскільки мутації вже виконуються правильно і дають результат,
+                // Треба буде зробити і свап теж, тільки вигадати що з чим можна буде свапати.
+                // По ідеї, наприклад, для однієї і тієї самої групи дивитись чи є дисципліни зі схожими параметрами
+                // +можна дивитись по підгрупам, поміняти їх місцями (таким чином може ми трошки збалансуємо розклад)
+                // +можна дивитись по викладачам, але напевно варто дивитись лише по тим у кого багато дисциплін
+
+                // var estimation = unit.Estimate();
+                logger.LogInformation($"ПІСЛЯН МУТ. №{gen} МАЄМО: {estimation} | АБО {estimation - baseEstimate} ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ");
+                
+                // var estimation = unit.Estimate(unit).TotalEstimation;
+                // повернутись до попереднього розкладу, якщо новий гірший
+                // UDP: вже робиться в ході самої мутації якщо вона не призвела до результату
+                if (estimation <= baseEstimate)
+                {
+                    // todo прибрати коли розберемось з відновленням слотів
+                    // UPD: Оскільки наче вдалось з цим ми розібратись, спробуємо закоментувати та не відновлювати дані таким шляхом
+                    // UPD!!! Стало прям відчутно швидше, може навіть у 2-3 рази, що просто чудово :)
+
+                    // unit.Root = cacheRoot.Root;
+                    // unit.Slots = cacheRoot.Slots;
+                    // unit.teacherSlots = cacheRoot.teacherSlots;
+                    // unit.groupsSlots = cacheRoot.groupsSlots;
+                    // unit.FirstTrackers = cacheRoot.FirstTrackers;
+                    //
+                    // // ці теж знадобляться
+                    // unit.assignedSlotsByTeacherDate = cacheRoot.assignedSlotsByTeacherDate;
+                    // unit.assignedSlotsByGroupDate = cacheRoot.assignedSlotsByGroupDate;
+                    //
+                    // cacheRoot = cacheRoot.CloneWithPrivateCache();
+                    
+                }
+                else
+                {
+                    // взяти новий розклад за основу
+                    // впринципі, вдалими є десь може 1 мутація з 7-8, тож тут можна клонувати,
+                    // особливо коли будемо працювати з кількома популяціями.
+                    
+                    // UPD: Оскільки наче вдалось з цим ми розібратись, спробуємо не копіювати дані
+                    // cacheRoot = unit;
+                    // cacheRoot = unit.CloneWithPrivateCache();
+                    baseEstimate = estimation; // Як же я довго шукав чому не зберігало кращі варіанти...
+                }
+            }
+            var res = unit.Estimate();
+            // var resCache = Estimate(cacheRoot);
+            logger.LogInformation($"ДО АЛГОРИМУ: {initEstimate} ПІСЛЯ АЛГОРИТМУ {res}");
+            if(initEstimate != 0)
+                logger.LogInformation($"МИ ЗРОБИЛИ КРАЩЕ НА {res - initEstimate}, АБО У: {res / (double)initEstimate} РАЗ");
+            if (res > initEstimate)
+            {
+                unit.initialResult.TotalEstimation = res; // todo?
+
+                var result = new AlgorithmResultDTO();
+                
+                result.TotalEstimation = res;
+                result.ScheduleSlots = unit.Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
+                result.Name = GetName();
+
+                unit.initialResult = result;
+            }
+        }
+        
+        #endregion
     }
+    
+    
 }

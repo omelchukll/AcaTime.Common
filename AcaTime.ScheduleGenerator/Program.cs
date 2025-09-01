@@ -1,4 +1,7 @@
-﻿using AcaTime.Algorithm.Default.Services;
+﻿using AcaTime.Algorithm.Alternative.Services;
+using AcaTime.Algorithm.Default.Services;
+using AcaTime.Algorithm.Genetic.Services;
+// using AcaTime.Algorithm.Second.Services;
 using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Services;
 using AcaTime.ScheduleGenerator.Abstract;
@@ -36,6 +39,9 @@ namespace AcaTime.ScheduleGenerator
 
                     // Реєструємо алгоритми вручну
                     services.AddSingleton<IScheduleAlgorithm, DefaultScheduleAlgorithm>();
+                    services.AddSingleton<IScheduleAlgorithm, GeneticScheduleAlgorithm>();
+                    services.AddSingleton<IScheduleAlgorithm, AlternativeScheduleAlgorithm>();
+
 
                     // Реєструємо сервіс для управління алгоритмами
                     services.AddSingleton<IScheduleParameters, ScheduleParameters>();

@@ -6,7 +6,10 @@ services:
   # API сервіс
   api:
     container_name: acatime-api
+    # platform: unknown/unknown
+    platform: linux/x86_64
     image: ghcr.io/omelchukll/acatime-api:latest
+    # image: ghcr.io/omelchukll/acatime-api:latest@sha256:83880300bf5c3fae84ae4e3319a51855acb81c100f09d707d98e2eeb5f6cb8e4
     ports:
       - "5000:80"
     environment:

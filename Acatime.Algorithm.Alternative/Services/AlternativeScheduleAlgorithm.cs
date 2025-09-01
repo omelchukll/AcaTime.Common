@@ -1,5 +1,5 @@
-﻿using AcaTime.Algorithm.Default.Models;
-using AcaTime.Algorithm.Default.Utils;
+﻿using AcaTime.Algorithm.Alternative.Models;
+using AcaTime.Algorithm.Alternative.Utils;
 using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScheduleCommon.Models.Constraints;
@@ -7,17 +7,17 @@ using AcaTime.ScriptModels;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
-namespace AcaTime.Algorithm.Default.Services
+namespace AcaTime.Algorithm.Alternative.Services
 {
     /// <summary>
     /// Алгоритм побудови розкладу
     /// </summary>
-    public class DefaultScheduleAlgorithm : IScheduleAlgorithm
+    public class AlternativeScheduleAlgorithm : IScheduleAlgorithm
     {
         public AlgorithmParams RunParameters { get; private set; }
         public DateTime StartTime { get; private set; }
 
-        DefaultScheduleAlgorithmUnit defaultUnit;
+        AlternativeScheduleAlgorithmUnit alternativeUnit;
         private ILogger logger;
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
         
@@ -30,8 +30,8 @@ namespace AcaTime.Algorithm.Default.Services
             this.RunParameters = runParameters;
             this.StartTime = DateTime.Now;
 
-            defaultUnit = new DefaultScheduleAlgorithmUnit();
-            defaultUnit.Setup(root, logger, userFunctions, runParameters);
+            alternativeUnit = new AlternativeScheduleAlgorithmUnit();
+            alternativeUnit.Setup(root, logger, userFunctions, runParameters);
 
             await Load();
 
@@ -66,11 +66,10 @@ namespace AcaTime.Algorithm.Default.Services
                 logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
                 await Parallel.ForEachAsync(
                     Enumerable.Range(0, runParameters.MaxIterations),
-                    // Enumerable.Range(0, runParameters.MaxIterations),
                     parallelOptions,
                     async (i, token) =>
                     {
-                        var unit = defaultUnit.Clone();
+                        var unit = alternativeUnit.Clone();
 
                         // set timeout for one itteration
                         var timeoutOneCts = new CancellationTokenSource();
@@ -144,9 +143,9 @@ namespace AcaTime.Algorithm.Default.Services
         private List<DomainValue> GenerateAvailableDomainValues()
         {
             var slots = new List<DomainValue>();
-            for (var date = defaultUnit.Root.BeginSeason; date <= defaultUnit.Root.EndSeason; date = date.AddDays(1))
+            for (var date = alternativeUnit.Root.BeginSeason; date <= alternativeUnit.Root.EndSeason; date = date.AddDays(1))
             {
-                for (int pair = 1; pair <= defaultUnit.Root.MaxLessonsPerDay; pair++)
+                for (int pair = 1; pair <= alternativeUnit.Root.MaxLessonsPerDay; pair++)
                 {
                     slots.Add(new DomainValue
                     {
@@ -164,20 +163,20 @@ namespace AcaTime.Algorithm.Default.Services
         private async Task Load()
         {
             var domains = GenerateAvailableDomainValues();
-            defaultUnit.Slots = defaultUnit.Root.GroupSubjects.SelectMany(x => x.ScheduleSlots).ToDictionary(x => x as IScheduleSlot, x => new SlotTracker { ScheduleSlot = x, AvailableDomains = new SortedSet<DomainValue>(domains) });
+            alternativeUnit.Slots = alternativeUnit.Root.GroupSubjects.SelectMany(x => x.ScheduleSlots).ToDictionary(x => x as IScheduleSlot, x => new SlotTracker { ScheduleSlot = x, AvailableDomains = new SortedSet<DomainValue>(domains) });
 
             // перевірка обмежень на одиничні слоти
-            foreach (var a in defaultUnit.UserFunctions.UnitaryConstraints)
+            foreach (var a in alternativeUnit.UserFunctions.UnitaryConstraints)
             {
-                var sl = a.Select(defaultUnit.Root);
+                var sl = a.Select(alternativeUnit.Root);
                 foreach (var v in sl)
                 {
-                    var tracker = defaultUnit.Slots[v];
+                    var tracker = alternativeUnit.Slots[v];
                     var domainsToRemove = new HashSet<DomainValue>();
                     foreach (var d in tracker.AvailableDomains)
                     {
                         tracker.SetDomain(d, 0);
-                        if (!a.Check(defaultUnit.GetAdapter(tracker.ScheduleSlot)))
+                        if (!a.Check(alternativeUnit.GetAdapter(tracker.ScheduleSlot)))
                         {
                             domainsToRemove.Add(d);
                         }
@@ -191,29 +190,29 @@ namespace AcaTime.Algorithm.Default.Services
 
             }
 
-            defaultUnit.teacherSlots = defaultUnit.Slots.Values.GroupBy(s => s.ScheduleSlot.GroupSubject.Teacher.Id, s => s).ToDictionary(x => x.Key, x => x.ToList());
-            defaultUnit.groupsSlots = new Dictionary<long, List<SlotTracker>>();
-            foreach (var sl in defaultUnit.Slots.Values)
+            alternativeUnit.teacherSlots = alternativeUnit.Slots.Values.GroupBy(s => s.ScheduleSlot.GroupSubject.Teacher.Id, s => s).ToDictionary(x => x.Key, x => x.ToList());
+            alternativeUnit.groupsSlots = new Dictionary<long, List<SlotTracker>>();
+            foreach (var sl in alternativeUnit.Slots.Values)
             {
                 foreach (var id in sl.ScheduleSlot.GroupSubject.Groups.Select(g => g.Id))
                 {
-                    if (!defaultUnit.groupsSlots.ContainsKey(id))
-                        defaultUnit.groupsSlots.Add(id, new List<SlotTracker>());
-                    defaultUnit.groupsSlots[id].Add(sl);
+                    if (!alternativeUnit.groupsSlots.ContainsKey(id))
+                        alternativeUnit.groupsSlots.Add(id, new List<SlotTracker>());
+                    alternativeUnit.groupsSlots[id].Add(sl);
                 }
             }
 
             // можливо декілька підгруп однієї групи на один слот - тоді будуть дублі
-            foreach (var k in defaultUnit.groupsSlots.Keys)
+            foreach (var k in alternativeUnit.groupsSlots.Keys)
             {
-                defaultUnit.groupsSlots[k] = defaultUnit.groupsSlots[k].Distinct().ToList();
+                alternativeUnit.groupsSlots[k] = alternativeUnit.groupsSlots[k].Distinct().ToList();
             }
 
             // групуємо слоти по серіям
             GroupAndFilterSeries();
 
             // зберігаємо перші слоти серій
-            defaultUnit.FirstTrackers = defaultUnit.Slots.Values.Where(x => x.IsFirstTrackerInSeries).ToList();
+            alternativeUnit.FirstTrackers = alternativeUnit.Slots.Values.Where(x => x.IsFirstTrackerInSeries).ToList();
         }
 
 
@@ -227,11 +226,11 @@ namespace AcaTime.Algorithm.Default.Services
             int currentSeriesId = 1;
 
             // для предметів з визначеними серіями потрібно визначити для кожного слоту серію та номер уроку в серії
-            foreach (var subject in defaultUnit.Root.GroupSubjects.Where(x => x.Subject.DefinedSeries != null && x.Subject.DefinedSeries.Count > 0))
+            foreach (var subject in alternativeUnit.Root.GroupSubjects.Where(x => x.Subject.DefinedSeries != null && x.Subject.DefinedSeries.Count > 0))
             {
                 // Отримуємо всі слот‑трекери для предмету
                 var trackers = subject.ScheduleSlots
-                    .Select(slot => defaultUnit.Slots[slot])
+                    .Select(slot => alternativeUnit.Slots[slot])
                     .OrderBy(t => t.ScheduleSlot.LessonNumber)
                     .ToList();
 
@@ -316,11 +315,11 @@ namespace AcaTime.Algorithm.Default.Services
                 }
             }
 
-            foreach (var subject in defaultUnit.Root.GroupSubjects.Where(x => x.Subject.DefinedSeries == null || x.Subject.DefinedSeries.Count == 0))
+            foreach (var subject in alternativeUnit.Root.GroupSubjects.Where(x => x.Subject.DefinedSeries == null || x.Subject.DefinedSeries.Count == 0))
             {
                 // Отримуємо всі слот‑трекери для предмету (за даними GroupSubject.ScheduleSlots)
                 var trackers = subject.ScheduleSlots
-                    .Select(slot => defaultUnit.Slots[slot])
+                    .Select(slot => alternativeUnit.Slots[slot])
                     .OrderBy(t => t.ScheduleSlot.LessonNumber)
                     .ToList();
 
@@ -595,7 +594,7 @@ namespace AcaTime.Algorithm.Default.Services
 
         public string GetName()
         {
-           return "Default";
+           return "Alternative";
         }
 
         /// <summary>

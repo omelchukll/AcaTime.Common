@@ -4,11 +4,15 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcaTime.Algorithm.Default", "AcaTime.Algorithm.Default\AcaTime.Algorithm.Default.csproj", "{F992D0EA-9CC3-0DFC-B443-8B4E1E90789F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acatime.Algorithm.Genetic", "Acatime.Algorithm.Genetic\Acatime.Algorithm.Genetic.csproj", "{C898C59B-33B9-44AE-B283-63AFFA0AF86D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcaTime.ScheduleCommon", "AcaTime.ScheduleCommon\AcaTime.ScheduleCommon.csproj", "{ED7D2EFC-843C-73E1-CF6C-0A830ED7E906}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcaTime.ScheduleGenerator", "AcaTime.ScheduleGenerator\AcaTime.ScheduleGenerator.csproj", "{7D127431-FA42-7DDF-7F22-C2BC4ADE4452}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcaTime.ScriptModels", "AcaTime.ScriptModels\AcaTime.ScriptModels.csproj", "{72429232-685D-4C7C-8645-FB8D27A5B94C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acatime.Algorithm.Alternative", "Acatime.Algorithm.Alternative\Acatime.Algorithm.Alternative.csproj", "{AA7E679F-26BF-4539-85F3-0C1A4713C907}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +36,14 @@ Global
 		{72429232-685D-4C7C-8645-FB8D27A5B94C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72429232-685D-4C7C-8645-FB8D27A5B94C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72429232-685D-4C7C-8645-FB8D27A5B94C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C898C59B-33B9-44AE-B283-63AFFA0AF86D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C898C59B-33B9-44AE-B283-63AFFA0AF86D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C898C59B-33B9-44AE-B283-63AFFA0AF86D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C898C59B-33B9-44AE-B283-63AFFA0AF86D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA7E679F-26BF-4539-85F3-0C1A4713C907}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA7E679F-26BF-4539-85F3-0C1A4713C907}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA7E679F-26BF-4539-85F3-0C1A4713C907}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA7E679F-26BF-4539-85F3-0C1A4713C907}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
