@@ -11,7 +11,7 @@ namespace AcaTime.Algorithm.Genetic.Utils
     public static class CloneHelper
     {
 
-        public static GeneticScheduleAlgoUnit CloneFromDefault(this GeneticScheduleAlgorithmUnit source)
+        public static GeneticScheduleAlgoUnit CloneFromDefault(this DefaultScheduleAlgorithmUnit source)
         {
             var resRoot = source.Root.Clone();
 
@@ -35,7 +35,7 @@ namespace AcaTime.Algorithm.Genetic.Utils
             
         }
         
-        public static GeneticScheduleAlgorithmUnit Clone(this GeneticScheduleAlgorithmUnit source)
+        public static DefaultScheduleAlgorithmUnit Clone(this DefaultScheduleAlgorithmUnit source)
         {
 
             var resRoot = source.Root.Clone();
@@ -46,7 +46,7 @@ namespace AcaTime.Algorithm.Genetic.Utils
             Dictionary<SlotTracker, SlotTracker> trackerMap = source.Slots.Values.ToDictionary(x => x, x => x.Clone(groupMap[x.ScheduleSlot.GroupSubject]));
 
 
-            var res = new GeneticScheduleAlgorithmUnit();
+            var res = new DefaultScheduleAlgorithmUnit();
 
             res.Setup(resRoot, source.logger, source.UserFunctions, source.Parameters);
 

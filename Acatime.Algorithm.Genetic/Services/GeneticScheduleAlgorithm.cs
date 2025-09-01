@@ -18,12 +18,12 @@ namespace AcaTime.Algorithm.Genetic.Services
         public DateTime StartTime { get; private set; }
 
         // GeneticScheduleAlgorithmUnit defaultUnit;
-        GeneticScheduleAlgorithmUnit defaultUnit;
+        DefaultScheduleAlgorithmUnit defaultUnit;
         
         private ILogger logger;
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
 
-        private GeneticScheduleAlgorithmUnit savedUnit;
+        private DefaultScheduleAlgorithmUnit savedUnit;
 
         public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default)
         {
@@ -37,7 +37,7 @@ namespace AcaTime.Algorithm.Genetic.Services
             // defaultUnit = new GeneticScheduleAlgorithmUnit();
             // defaultUnit.Setup(root, logger, userFunctions, runParameters);
             
-            defaultUnit = new GeneticScheduleAlgorithmUnit();
+            defaultUnit = new DefaultScheduleAlgorithmUnit();
             defaultUnit.Setup(root, logger, userFunctions, runParameters);
 
             await Load();
@@ -147,7 +147,7 @@ namespace AcaTime.Algorithm.Genetic.Services
             {
                 var result = res[0];
                 
-                var defaultResultUnit = savedUnit.CloneWithPrivateCache();
+                var defaultResultUnit = savedUnit.CloneFromDefault();
                 result.ScheduleSlots = defaultResultUnit.Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
 
                 var defaultResult = res[0];
@@ -175,7 +175,7 @@ namespace AcaTime.Algorithm.Genetic.Services
             }
 
             return res;
-        }      
+        }
         
         /// <summary>
         /// Отримує статистику роботи алгоритму
