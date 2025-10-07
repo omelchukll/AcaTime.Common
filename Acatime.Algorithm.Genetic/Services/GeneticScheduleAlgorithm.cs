@@ -74,7 +74,7 @@ namespace AcaTime.Algorithm.Genetic.Services
                 await Parallel.ForEachAsync(
                     // Enumerable.Range(0, 1),
                     // Enumerable.Range(0, 1),
-                    Enumerable.Range(0, runParameters.MaxIterations),
+                    Enumerable.Range(0, parallelOptions.MaxDegreeOfParallelism),
                     parallelOptions,
                     async (i, token) =>
                     {
@@ -162,19 +162,106 @@ namespace AcaTime.Algorithm.Genetic.Services
 
                 var before = defaultResult.TotalEstimation;
                 
-                Calculate(unit);
-                    
+                // Calculate(unit);
+                var algoRes = await Cal(RunParameters, ignoreClassrooms, cancellationToken);
+                // var r = algoRes.Select(r => r).OrderBy(r => r.TotalEstimation).First();
+                res.AddRange(algoRes.Select(r => r).OrderBy(r => r.TotalEstimation));
+
+                // res.Insert(0, r);
                 var after = unit.initialResult.TotalEstimation;
                 logger.LogInformation($"БУЛО: {before}");
                 logger.LogInformation($"СТАЛО: {after}");
 
-                if (after > before)
-                {
-                    res.Insert(0, unit.initialResult);
-                }
+                // if (after > before)
+                // {
+                //     res.Insert(0, unit.initialResult);
+                // }
             }
 
             return res;
+        }
+
+        private async Task<ConcurrentBag<AlgorithmResultDTO>> Cal(AlgorithmParams runParameters, bool ignoreClassrooms, CancellationToken cancellationToken = default)
+        {
+            // Створюємо джерело токенів скасування, яке можна використовувати для обмеження часу виконання
+            using var timeoutCts = new CancellationTokenSource();
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken);
+
+            ParallelOptions parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount > 4 ? Environment.ProcessorCount / 4 : 1,
+                CancellationToken = linkedCts.Token
+            };
+
+            // time for one iteration
+            var timeOneSec = runParameters.TimeoutInSeconds * parallelOptions.MaxDegreeOfParallelism / runParameters.MaxIterations;
+
+            statistics = new AlgorithmStatistics();
+            var results = new ConcurrentBag<AlgorithmResultDTO>();
+
+            try
+            {
+                // Запускаємо паралельні обчислення
+
+                logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
+                await Parallel.ForEachAsync(
+                    // Enumerable.Range(0, 1),
+                    // Enumerable.Range(0, 1),
+                    Enumerable.Range(0, 1),
+                    parallelOptions,
+                    async (i, token) =>
+                    {
+                        // var unit = defaultUnit.Clone();
+                        // var unit = defaultUnit.Clone();
+                        
+                        GeneticScheduleAlgorithmUnit unit = savedUnit.CloneFromDefault();
+
+                        // set timeout for one iteration
+                        var timeoutOneCts = new CancellationTokenSource();
+                        var linkedOneCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutOneCts.Token, token);
+
+                        timeoutOneCts.CancelAfter(TimeSpan.FromSeconds(timeOneSec));
+
+                        // var res = await unit.Run(root, userFunctions, null, ignoreClassrooms, logger, linkedOneCts.Token);
+                        // var result = res.Count != 0 ? res[0] : null;
+                        
+                        var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
+                        
+                        if (result != null)
+                        {
+                            lock (results)
+                            {
+                                statistics.Success++;
+                                result.Name = GetName();
+                                results.Add(result);
+                                
+                                // Сортуємо та обмежуємо кількість результатів при необхідності
+                                // if (results.Count > runParameters.ResultsCount)
+                                // {
+                                //     var sortedResults = results.OrderByDescending(x => x.TotalEstimation).Take(runParameters.ResultsCount).ToList();
+                                //     results.Clear();
+                                //     foreach (var sortedResult in sortedResults)
+                                //     {
+                                //         results.Add(sortedResult);
+                                //     }                                    
+                                // }
+
+                                statistics.BestResult = results.Max(x => x.TotalEstimation);
+                            }
+                        }
+                        else
+                        {
+                            statistics.Failed++;
+                        }
+                    });
+            }
+            catch (OperationCanceledException)
+            {
+                // Операція була скасована через таймаут або токен скасування
+                logger.LogInformation("Обчислення алгоритму було перервано через таймаут або зовнішнє скасування");
+            }
+
+            return results;
         }
         
         /// <summary>
@@ -744,9 +831,9 @@ namespace AcaTime.Algorithm.Genetic.Services
             // upd наче розібрався?
             // UDP на 150-200 ітерацій виходить навіть +10-15%
             // Це добре що номільнально оцінка стає краще, але треба детально роздивлятись excel файли. Роздивившись, можу сказати що десь ці зміни мають певний сенс, як такий альтернативний погляд, люфт
-            // var maxGenerations = 100;
+            var maxGenerations = 100;
             // var maxGenerations = 150;
-            var maxGenerations = RunParameters.GeneticIterations;
+            // var maxGenerations = RunParameters.GeneticIterations;
             logger.LogInformation($"ПОЧАТОК ГЕН АЛГОРИТМУ. КІЛЬКІСТЬ ІТЕРАЦІЙ {maxGenerations}");
 
             var initEstimate = unit.Estimate();
@@ -758,8 +845,19 @@ namespace AcaTime.Algorithm.Genetic.Services
                 var estimation = 0;
                 var e = unit.Estimate();
                 
-                for(var i = 0; i < 1; i++)
-                    estimation = unit.Mutations(e);
+                // unit.Swap();
+
+                // estimation = unit.Mutations(e);
+                
+                // for (var i = 0; i < 1; i++)
+                // {
+                //     unit.Mutations(e);
+                //     unit.MutationsForLongSeries(e);
+                // }
+                //     estimation = unit.MutationsForLongSeries(e);
+                
+                // for(var i = 0; i < 1; i++)
+                //     estimation = unit.Mutations(e);
                 // Зараз виконуємо лише мутації, оскільки мутації вже виконуються правильно і дають результат,
                 // Треба буде зробити і свап теж, тільки вигадати що з чим можна буде свапати.
                 // По ідеї, наприклад, для однієї і тієї самої групи дивитись чи є дисципліни зі схожими параметрами
@@ -767,43 +865,29 @@ namespace AcaTime.Algorithm.Genetic.Services
                 // +можна дивитись по викладачам, але напевно варто дивитись лише по тим у кого багато дисциплін
 
                 // var estimation = unit.Estimate();
-                logger.LogInformation($"ПІСЛЯН МУТ. №{gen} МАЄМО: {estimation} | АБО {estimation - baseEstimate} ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ");
-                
-                // var estimation = unit.Estimate(unit).TotalEstimation;
-                // повернутись до попереднього розкладу, якщо новий гірший
-                // UDP: вже робиться в ході самої мутації якщо вона не призвела до результату
-                if (estimation <= baseEstimate)
-                {
-                    // todo прибрати коли розберемось з відновленням слотів
-                    // UPD: Оскільки наче вдалось з цим ми розібратись, спробуємо закоментувати та не відновлювати дані таким шляхом
-                    // UPD!!! Стало прям відчутно швидше, може навіть у 2-3 рази, що просто чудово :)
+                logger.LogInformation($"ПІСЛЯ МУТ. №{gen} МАЄМО: {estimation} | АБО {estimation - baseEstimate} ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ");
 
-                    // unit.Root = cacheRoot.Root;
-                    // unit.Slots = cacheRoot.Slots;
-                    // unit.teacherSlots = cacheRoot.teacherSlots;
-                    // unit.groupsSlots = cacheRoot.groupsSlots;
-                    // unit.FirstTrackers = cacheRoot.FirstTrackers;
-                    //
-                    // // ці теж знадобляться
-                    // unit.assignedSlotsByTeacherDate = cacheRoot.assignedSlotsByTeacherDate;
-                    // unit.assignedSlotsByGroupDate = cacheRoot.assignedSlotsByGroupDate;
-                    //
-                    // cacheRoot = cacheRoot.CloneWithPrivateCache();
-                    
-                }
-                else
+                if (estimation > baseEstimate)
                 {
-                    // взяти новий розклад за основу
-                    // впринципі, вдалими є десь може 1 мутація з 7-8, тож тут можна клонувати,
-                    // особливо коли будемо працювати з кількома популяціями.
-                    
-                    
-                    // UPD: Оскільки наче вдалось з цим ми розібратись, спробуємо не копіювати дані
-                    // cacheRoot = unit;
-                    // cacheRoot = unit.CloneWithPrivateCache();
                     baseEstimate = estimation; // Як же я довго шукав чому не зберігало кращі варіанти...
                 }
             }
+
+            // виявлено що мутації для дисциплін з малою кількістю занять мають багато варіантів, тож виконуються дещо повільніше, тому обмежимо парою десятків
+            // for (var gen = 0; gen < 30; gen++)
+            // {
+            //     var estimation = 0;
+            //     var e = unit.Estimate();
+            //     estimation = unit.Mutations(e);
+            //     logger.LogInformation($"ПІСЛЯ МУТ. №{gen} МАЄМО: {estimation} | АБО {estimation - baseEstimate} ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ");
+            //     if (estimation > baseEstimate)
+            //     {
+            //         baseEstimate = estimation; // Як же я довго шукав чому не зберігало кращі варіанти...
+            //     }
+            // }
+
+            
+            
             var res = unit.Estimate();
             // var resCache = Estimate(cacheRoot);
             logger.LogInformation($"ДО АЛГОРИМУ: {initEstimate} ПІСЛЯ АЛГОРИТМУ {res}");

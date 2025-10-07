@@ -1,5 +1,6 @@
 ﻿using AcaTime.Algorithm.Genetic.Models;
 using AcaTime.Algorithm.Genetic.Services;
+using AcaTime.Algorithm.Genetic.Services.Util;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScriptModels;
 
@@ -204,6 +205,53 @@ namespace AcaTime.Algorithm.Genetic.Utils
             groupSubject.ScheduleSlots.Add(clone);
 
             return clone;
+        }
+
+        public static Individual CloneFromUnit(this GeneticScheduleAlgorithmUnit source)
+        {
+            var resRoot = source.Root.Clone();
+
+            Dictionary<GroupSubjectDTO, GroupSubjectDTO> groupMap = source.Root.GroupSubjects.ToDictionary(x => x, x => x.Clone(resRoot));
+            Dictionary<SlotTracker, SlotTracker> trackerMap = source.Slots.Values.ToDictionary(x => x, x => x.Clone(groupMap[x.ScheduleSlot.GroupSubject]));
+
+            var res = new Individual();
+
+            res.Setup(resRoot, source.logger, source.UserFunctions, source.Parameters);
+
+            res.teacherSlots = source.teacherSlots.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(x => trackerMap[x]).ToList());
+            res.groupsSlots = source.groupsSlots.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(x => trackerMap[x]).ToList());
+            res.FirstTrackers = source.FirstTrackers.Select(x => trackerMap[x]).ToList();
+            res.Slots = source.Slots.ToDictionary(kvp => trackerMap[kvp.Value].ScheduleSlot as IScheduleSlot, kvp => trackerMap[kvp.Value]);
+            
+            // це поки залишимо таким чином
+            res.assignedSlotsByTeacherDate = source.assignedSlotsByTeacherDate;
+            res.assignedSlotsByGroupDate = source.assignedSlotsByGroupDate;
+            
+            return res;
+        }
+
+        public static Individual clone(this Individual source)
+        {
+            var resRoot = source.Root.Clone();
+
+            Dictionary<GroupSubjectDTO, GroupSubjectDTO> groupMap = source.Root.GroupSubjects.ToDictionary(x => x, x => x.Clone(resRoot));
+            Dictionary<SlotTracker, SlotTracker> trackerMap = source.Slots.Values.ToDictionary(x => x, x => x.Clone(groupMap[x.ScheduleSlot.GroupSubject]));
+
+            var res = new Individual();
+
+            res.Setup(resRoot, source.logger, source.UserFunctions, source.Parameters);
+
+            res.teacherSlots = source.teacherSlots.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(x => trackerMap[x]).ToList());
+            res.groupsSlots = source.groupsSlots.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(x => trackerMap[x]).ToList());
+            res.FirstTrackers = source.FirstTrackers.Select(x => trackerMap[x]).ToList();
+            res.Slots = source.Slots.ToDictionary(kvp => trackerMap[kvp.Value].ScheduleSlot as IScheduleSlot, kvp => trackerMap[kvp.Value]);
+            
+            // це поки залишимо таким чином
+            res.assignedSlotsByTeacherDate = source.assignedSlotsByTeacherDate;
+            res.assignedSlotsByGroupDate = source.assignedSlotsByGroupDate;
+            
+            return res;
+
         }
 
 
