@@ -1,4 +1,5 @@
 ﻿using AcaTime.Algorithm.Default.Models;
+using AcaTime.Algorithm.Default.Services.Statictics;
 using AcaTime.Algorithm.Default.Utils;
 using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Models.Calc;
@@ -20,12 +21,20 @@ namespace AcaTime.Algorithm.Default.Services
         DefaultScheduleAlgorithmUnit defaultUnit;
         private ILogger logger;
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
-        
+        private readonly IScheduleStatisticsService scheduleStatisticsService;
+
+        public DefaultScheduleAlgorithm(IScheduleStatisticsService scheduleStatisticsService)
+        {
+            this.scheduleStatisticsService = scheduleStatisticsService;
+        }
+
         public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default)
         {
+          
             this.logger = logger;
 
             var runParameters = new AlgorithmParams(parameters);
+            logger.LogInformation($"Запуск алгоритму {this.GetName()} з параметрами: {string.Join(", ", parameters.Select(kv => $"{kv.Key}={kv.Value}"))}, ignoreClassrooms={ignoreClassrooms}");
 
             this.RunParameters = runParameters;
             this.StartTime = DateTime.Now;
@@ -79,6 +88,8 @@ namespace AcaTime.Algorithm.Default.Services
 
                         var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
 
+                        
+
                         if (result != null)
                         {
                             lock (results)
@@ -104,6 +115,21 @@ namespace AcaTime.Algorithm.Default.Services
                         {
                             statistics.Failed++;
                         }
+
+                        statistics.ScheduleStatistics.Add(new ScheduleStatisticsModel
+                        {
+                            MaxExecutionTimeSec = runParameters.TimeoutInSeconds,
+                            Deterministic = runParameters.SlotsTopK<2 && runParameters.DomainsTopK<2,
+                            ParallelCount = parallelOptions.MaxDegreeOfParallelism,
+                            MaxIterations = runParameters.MaxIterations,
+                            SlotsTopK = runParameters.SlotsTopK,
+                            SlotsTemperature = runParameters.SlotsTemperature,
+                            DomainsTopK = runParameters.DomainsTopK,
+                            DomainsTemperature = runParameters.DomainsTemperature,
+                            LastStep = 0,
+                            ResultScore = result?.TotalEstimation ,
+                            ExecutionTimeMs = unit.DebugData.TotalMs
+                        });
                     });
             }
             catch (OperationCanceledException)
@@ -119,6 +145,8 @@ namespace AcaTime.Algorithm.Default.Services
                 .OrderByDescending(x => x.TotalEstimation)
                 .Take(runParameters.ResultsCount)
                 .ToList();
+
+            await this.scheduleStatisticsService.SaveStatisticsAsync(statistics.ScheduleStatistics).ConfigureAwait(false);
 
             return res;
         }      

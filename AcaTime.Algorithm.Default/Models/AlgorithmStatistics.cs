@@ -23,6 +23,9 @@
         /// </summary>
         public int BestResult { get; set; }
 
+
+        public List<ScheduleStatisticsModel> ScheduleStatistics { get; set; } = new List<ScheduleStatisticsModel>();
+
     }
 
 }

@@ -58,6 +58,9 @@ namespace AcaTime.Algorithm.Default.Services
         private ScheduleSlotDTO lastProcessingSlot = null; // для відстеження останнього слоту в обробці
         private ScheduleSlotDTO lastAssignedSlot = null; // для відстеження останнього призначеного слоту
 
+
+        
+
         /// <summary>
         /// Налаштування алгоритму
         /// </summary>

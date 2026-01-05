@@ -94,5 +94,10 @@ namespace AcaTime.ScheduleCommon.Utils
             else
                 return $"{_operation} ({stepStr})";
         }
+
+        /// <summary>
+        /// Затрачено на всі кроки
+        /// </summary>
+        public int TotalMs => (int)(steps.Sum(p => p.Value) * 1000 / Stopwatch.Frequency);
     }
 }

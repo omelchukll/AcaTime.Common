@@ -1,4 +1,5 @@
 ﻿using AcaTime.Algorithm.Default.Services;
+using AcaTime.Algorithm.Default.Services.Statictics;
 using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Services;
 using AcaTime.ScheduleGenerator.Abstract;
@@ -35,6 +36,7 @@ namespace AcaTime.ScheduleGenerator
 
 
                     // Реєструємо алгоритми вручну
+                    services.AddSingleton<IScheduleStatisticsService, FakeScheduleStatisticsService>();
                     services.AddSingleton<IScheduleAlgorithm, DefaultScheduleAlgorithm>();
 
                     // Реєструємо сервіс для управління алгоритмами
