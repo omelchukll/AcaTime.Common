@@ -16,12 +16,12 @@ namespace AcaTime.Algorithm.Default.Services.Statictics
     public class ScheduleStatisticsService : IScheduleStatisticsService
     {
         private readonly string _connectionString;
-        private readonly Logger<ScheduleStatisticsService> logger;
+        private readonly ILogger<ScheduleStatisticsService> logger;
 
         /// <summary>
         /// Ініціалізує сервіс з рядком підключення.
         /// </summary>
-        public ScheduleStatisticsService(string connectionString, Logger<ScheduleStatisticsService> logger)
+        public ScheduleStatisticsService(string connectionString, ILogger<ScheduleStatisticsService> logger)
         {
             _connectionString = connectionString;
             this.logger = logger;
