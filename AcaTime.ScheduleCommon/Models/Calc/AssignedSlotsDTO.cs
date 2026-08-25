@@ -33,7 +33,7 @@ namespace AcaTime.ScheduleCommon.Models.Calc
             _teacherAndDateSlotFactory = slotsByTeacherAndDateFactory;
             _groupAndDateSlotFactory = slotsByGroupAndDateFactory;
         }
-
+        
         /// <summary>
         /// Всі призначені слоти (відкладене обчислення, кешоване, потокобезпечне).
         /// </summary>

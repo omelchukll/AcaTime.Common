@@ -73,8 +73,8 @@ namespace AcaTime.Algorithm.Genetic.Services
                 logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
                 await Parallel.ForEachAsync(
                     // Enumerable.Range(0, 1),
-                    // Enumerable.Range(0, 1),
-                    Enumerable.Range(0, parallelOptions.MaxDegreeOfParallelism),
+                    Enumerable.Range(0, 1),
+                    // Enumerable.Range(0, parallelOptions.MaxDegreeOfParallelism),
                     parallelOptions,
                     async (i, token) =>
                     {
@@ -842,7 +842,7 @@ namespace AcaTime.Algorithm.Genetic.Services
 
             for (var gen = 0; gen < maxGenerations; gen++)
             {
-                var estimation = 0;
+                var estimation = Int32.MinValue;
                 var e = unit.Estimate();
                 
                 // unit.Swap();

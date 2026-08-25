@@ -138,6 +138,9 @@ namespace AcaTime.Algorithm.Genetic.Services
 
                 CheckResult(res);
 
+                var weird = Slots.Values.Where(v => v.ScheduleSlot.Date == new DateTime(2025, 08, 31)).Select(x => x.ScheduleSlot).ToList();
+
+                logger.LogInformation($"{algorithmName}: werird {weird}");
                 logger.LogInformation($"{algorithmName}: Schedule points {scheduleEstimation}");
             }
 

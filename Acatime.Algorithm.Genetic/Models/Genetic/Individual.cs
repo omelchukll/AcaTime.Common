@@ -1,5 +1,4 @@
-using System.Runtime.CompilerServices;
-using AcaTime.Algorithm.Genetic.Models;
+using System.Collections.Immutable;
 using AcaTime.Algorithm.Genetic.Services.Calc;
 using AcaTime.Algorithm.Genetic.Utils;
 using AcaTime.ScheduleCommon.Models.Calc;
@@ -7,7 +6,7 @@ using AcaTime.ScheduleCommon.Models.Constraints;
 using AcaTime.ScriptModels;
 using Microsoft.Extensions.Logging;
 
-namespace AcaTime.Algorithm.Genetic.Services.Util;
+namespace AcaTime.Algorithm.Genetic.Models.Genetic;
 
 public class Individual
 {
@@ -33,7 +32,7 @@ public class Individual
     internal List<SlotTracker> FirstTrackers;
 
     // приватний кеш
-    private Dictionary<int, List<SlotTracker>> slotsByStep = new Dictionary<int, List<SlotTracker>>(); // для зберігання слотів по крокам
+    // private Dictionary<int, List<SlotTracker>> slotsByStep = new Dictionary<int, List<SlotTracker>>(); // для зберігання слотів по крокам
     internal Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>> assignedSlotsByTeacherDate = new Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>>();
     internal Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>> assignedSlotsByGroupDate = new Dictionary<long, Dictionary<DateTime, HashSet<SlotTracker>>>();
     // private HashSet<SlotTracker> unassignedFirstSlots;
@@ -60,11 +59,6 @@ public class Individual
             .GroupBy(s => s.ScheduleSlot.GroupSubject.Id)
             .ToDictionary(g => g.Key, g => g.OrderBy(s => s.SeriesId).ToList());
 
-        // unassignedFirstSlots = firstSlotsByGroupSubjects.Values.Select(x => x.First())
-        //     .ToHashSet();
-        // можливо треба буде також призначати і
-        // assignedSlotsByTeacherDate
-        // assignedSlotsByGroupDate
         isInit = true;
     }
 
@@ -134,6 +128,12 @@ public class Individual
                         !e.IsLowDaysDanger &&
                         e.ScheduleSlot.LessonSeriesLength <= maxSeriesLength)
                     .ToList();
+            }
+
+            if (list.Count == 0)
+            {
+                usedTrackers.Clear();
+                return null;
             }
             // var list = FirstTrackers.Select(e => e).Where(e => (!usedTrackers.ContainsKey(e) || usedTrackers[e] < 3) && e is { IsLowDaysDanger: false, ScheduleSlot.LessonSeriesLength: < 4 }).ToList();
             var firstRandomLesson = list.ElementAt(_random.Next(0, list.Count));
@@ -293,7 +293,7 @@ public class Individual
                         freeTRackers.ForEach(e => Slots[e.ScheduleSlot] = e);
                             
                         // залогуємо наші зміни щоб було легше шукати в excel таблиці різницю з дефолт алгоритмом
-                        logger.LogInformation($"ПЕРЕНОС ДАВ РЕЗУЛЬТАТ");
+                        logger.LogInformation($"ПЕРЕНОС ДАВ РЕЗУЛЬТАТ З {currentEstimation} НА {res}");
                         logger.LogInformation($"БУЛО: ВИКЛАДАЧ:{tracker.ScheduleSlot.GroupSubject.Teacher.Name}|ДАТА:{cacheDomain.Date}|НОМЕР:{cacheDomain.PairNumber} СТАЛО:ДАТА:{tracker.ScheduleSlot.Date}|НОМЕР:{tracker.ScheduleSlot.PairNumber} ");
 
                         this.currentEstimation = res;
@@ -477,9 +477,7 @@ public class Individual
                     .Select(s => s)
                     .Where(s => s.IsFirstTrackerInSeries)
                     .ToList();
-
-                // var firstGroupSubjects = assignedSlotsByGroupDate[groups[0].Id].Values.ToList();
-
+                
                 var potentialSubjectToSwap = new List<SlotTracker>();
 
                 foreach (var slot in slots)
@@ -593,7 +591,8 @@ public class Individual
                             freeTRackersSecond.ForEach(e => Slots[e.ScheduleSlot] = e);
                             
                             currentEstimation = res;
-                            
+                            logger.LogInformation($"ЗРОБИЛИ КРАЩЕ СВАПОМ ГРУП");
+
                             if(firstRandomLessonTracker.SeriesId != null && subjectTracker.SeriesId != null)
                                 return new KeyValuePair<int, int>((int)firstRandomLessonTracker.SeriesId, (int)subjectTracker.SeriesId);
                             return null;
@@ -698,7 +697,7 @@ public class Individual
         }
     }
 
-    internal int currentEstimation;
+    internal int currentEstimation = Int32.MinValue;
     
     public Individual SwapSeriesTrackersClone(SlotTracker first, SlotTracker second)
     {
@@ -827,7 +826,7 @@ public class Individual
                 if (!slot.RejectedDomains.ContainsKey(currentStep))
                     slot.RejectedDomains[currentStep] = new List<DomainValue>();
                 slot.RejectedDomains[currentStep].AddRange(removed);
-                slotsByStep[currentStep].Add(slot);
+                // slotsByStep[currentStep].Add(slot);
             }
 
             // Якщо домен став порожнім, повертаємо false.

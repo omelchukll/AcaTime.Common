@@ -13,7 +13,6 @@ namespace AcaTime.ScheduleCommon.Models.Calc
 
         /// <summary>Назва предмету.</summary>
         public string Name { get; set; }
-
         
 
         /// <summary>Кількість пар по замовчуванню для однієї групи.</summary>

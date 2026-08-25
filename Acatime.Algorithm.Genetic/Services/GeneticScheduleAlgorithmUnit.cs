@@ -11,7 +11,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.Design.Serialization;
 using System.Net.Security;
 using System.Runtime.CompilerServices;
-using AcaTime.Algorithm.Genetic.Services.Util;
+using AcaTime.Algorithm.Genetic.Models.Genetic;
 
 
 namespace AcaTime.Algorithm.Genetic.Services;
@@ -141,13 +141,13 @@ public class GeneticScheduleAlgorithmUnit
             {
                 if (subStrategy > 7)
                 {
-                    logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationSwapGroupSubjects");
+                    // logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationSwapGroupSubjects");
                     PopulationSwapGroupSubjects(individual);
                 }
                 else
                 {
                     PopulationSwapTeacherSubjects(individual);
-                    logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationSwapTeacherSubjects");
+                    // logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationSwapTeacherSubjects");
                 }
             }
             else
@@ -155,12 +155,12 @@ public class GeneticScheduleAlgorithmUnit
                 if (subStrategy > 7)
                 {
                     PopulationMutationsForShortSeries(individual);
-                    logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationMutationsForShortSeries");
+                    // logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationMutationsForShortSeries");
                 }
                 else
                 {
                     PopulationMutationsForLongSeries(individual);
-                    logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationMutationsForLongSeries");
+                    // logger.LogInformation($"ВИКОНУЄМО ОПЕРАЦІЮ ДЛЯ ПОПУЛЯЦІЇ {iteration} СТРАТЕГІЯ PopulationMutationsForLongSeries");
                 }
             }
         }
@@ -174,6 +174,10 @@ public class GeneticScheduleAlgorithmUnit
             
             // створити 1у популяцію
             var initialPopulation = this.CloneFromUnit();
+            
+            // IndividualMapper mapper = new IndividualMapper();
+            // mapper.PrepareIndividual(initialPopulation);
+            
             initialPopulation.currentEstimation = initialPopulation.Estimate();
             population.Add(initialPopulation);
             
@@ -182,6 +186,21 @@ public class GeneticScheduleAlgorithmUnit
             
             logger.LogInformation($"ПОЧАТОК ГЕН АЛГОРИТМУ. КІЛЬКІСТЬ ІТЕРАЦІЙ {Parameters.GeneticIterations}");
 
+
+            // GeneticOperations operations = new GeneticOperations();
+            // operations.Setup(logger,initialPopulation);
+            // for (var i = 0; i < 50; i++)
+            // {
+            //     operations.MakeOperation();
+            //     foreach (var combinedIndividual in operations.population)
+            //     {
+            //         var currEst = combinedIndividual.currentEstimation;
+            //         logger.LogInformation($"ПІСЛЯ МУТ. №{i} МАЄМО: {currEst} | АБО {currEst - prevEstimate} ВІД НАЙКРАЩОГО РЕЗУЛЬТАТУ");
+            //     }
+            //     // var currEstimate = Estimate();
+            //     
+            // }
+            
             for (var i = 0; i < Parameters.GeneticIterations; i++)
             {
                 limit = 5;
@@ -241,6 +260,9 @@ public class GeneticScheduleAlgorithmUnit
                 // SwapGroupSubjects();
                 // SwapTeacherSubjects();
                 var currEstimate = population[0].currentEstimation;
+                
+                // if(currEstimate == 0)
+                //     currEstimate = Int32.MinValue;
                 // var currEstimate = Estimate();
                 
                 // а потім візьмемо цю копію і застосуємо її
@@ -264,6 +286,10 @@ public class GeneticScheduleAlgorithmUnit
                 result.TotalEstimation = prevEstimate;
                 
                 result.ScheduleSlots = population[0].Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
+                
+                // var slots = mapper.RefineIndividualSchedulleSlots(population[0]);
+                // result.ScheduleSlots = slots;
+
                 // result.ScheduleSlots = Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
                 result.Name = "Genetic";
 
@@ -651,6 +677,7 @@ public class GeneticScheduleAlgorithmUnit
             var swappedSubjects = clonedIndividual.SwapTeacherSubjects();
             if(swappedSubjects == null)
                 return;
+            logger.LogInformation($"ДОДАЄМО ЦЕ У ПОПУЛЯЦІЮ");
             newGeneration.Add(clonedIndividual);
             
             // якщо в цій популяції щось стало краще, дивимось, чи можемо ми перенести цю зміну у найкращу популяцію
@@ -659,7 +686,7 @@ public class GeneticScheduleAlgorithmUnit
                 clonedIndividual.currentEstimation > individual.currentEstimation &&
                 clonedIndividual.currentEstimation < population[0].currentEstimation
                 )
-            {
+            {   
                 logger.LogInformation($"ОСЬ ТУТ ТРЕБА ПРОБУВАТИ ПЕРЕНЕСТИ ЗМІНИ!");
                 if(swappedSubjects != null)
                     population[0].ApplyTeacherSubjectsSwap((KeyValuePair<int, int>)swappedSubjects);
@@ -673,6 +700,7 @@ public class GeneticScheduleAlgorithmUnit
             var swappedSubjects = clonedIndividual.SwapGroupSubjects();
             if(swappedSubjects == null)
                 return;
+            logger.LogInformation($"ДОДАЄМО СВАП ГРУП ДО ПОПУЛЯЦІЇ");
             newGeneration.Add(clonedIndividual);
             
             // якщо в цій популяції щось стало краще, дивимось, чи можемо ми перенести цю зміну у найкращу популяцію

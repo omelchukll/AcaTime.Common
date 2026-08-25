@@ -1,6 +1,6 @@
 ﻿using AcaTime.Algorithm.Genetic.Models;
+using AcaTime.Algorithm.Genetic.Models.Genetic;
 using AcaTime.Algorithm.Genetic.Services;
-using AcaTime.Algorithm.Genetic.Services.Util;
 using AcaTime.ScheduleCommon.Models.Calc;
 using AcaTime.ScriptModels;
 
@@ -189,6 +189,25 @@ namespace AcaTime.Algorithm.Genetic.Utils
             return clone;
         }
 
+        public static SlotTracker CloneReplace(this SlotTracker src, GroupSubjectDTO groupSubject)
+        {
+            var clone = new SlotTracker
+            {
+                ScheduleSlot = src.ScheduleSlot.CloneReplace(groupSubject),
+                AssignStep = src.AssignStep,
+                AvailableDomains = new SortedSet<DomainValue>(src.AvailableDomains),
+                IsAssigned = src.IsAssigned,
+                IsFirstTrackerInSeries = src.IsFirstTrackerInSeries,
+                IsLowDaysDanger = src.IsLowDaysDanger,
+                RejectedDomains = src.RejectedDomains.ToDictionary(kvp => kvp.Key, kvp => new List<DomainValue>(kvp.Value)),
+                SeriesId = src.SeriesId,
+                SeriesLength = src.SeriesLength,
+                WeekShift = src.WeekShift               
+            };
+
+            return clone;
+        }
+
         public static ScheduleSlotDTO Clone(this ScheduleSlotDTO src, GroupSubjectDTO groupSubject)
         {
             var clone = new ScheduleSlotDTO
@@ -205,6 +224,30 @@ namespace AcaTime.Algorithm.Genetic.Utils
             groupSubject.ScheduleSlots.Add(clone);
 
             return clone;
+        }
+        
+        public static ScheduleSlotDTO CloneReplace(this ScheduleSlotDTO src, GroupSubjectDTO groupSubject)
+        {
+            var clone = new ScheduleSlotDTO
+            {
+                Id = src.Id,
+                LessonNumber = src.LessonNumber,
+                Date = src.Date,
+                PairNumber = src.PairNumber,
+                LessonSeriesLength = src.LessonSeriesLength,
+                LessonSeriesId = src.LessonSeriesId,
+                GroupSubject = groupSubject
+            };
+
+            var index = groupSubject.ScheduleSlots.IndexOf(src);
+            groupSubject.ScheduleSlots[index] = clone;
+            return clone;
+        }
+
+        public static void ReplaceGroupSubjectSlot(this ScheduleSlotDTO src, ScheduleSlotDTO replaceWith,  GroupSubjectDTO groupSubject)
+        {
+            var index = groupSubject.ScheduleSlots.IndexOf(src);
+            groupSubject.ScheduleSlots[index] = replaceWith;
         }
 
         public static Individual CloneFromUnit(this GeneticScheduleAlgorithmUnit source)
