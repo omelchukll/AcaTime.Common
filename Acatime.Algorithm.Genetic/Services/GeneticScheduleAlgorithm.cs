@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using AcaTime.Algorithm.Genetic.Models;
+using AcaTime.Algorithm.Genetic.Models.Genetic;
 using AcaTime.Algorithm.Genetic.Utils;
 using AcaTime.ScheduleCommon.Abstract;
 using AcaTime.ScheduleCommon.Models.Calc;
@@ -24,6 +25,12 @@ namespace AcaTime.Algorithm.Genetic.Services
         private AlgorithmStatistics statistics = new AlgorithmStatistics();
 
         private DefaultScheduleAlgorithmUnit savedUnit;
+
+        /// <summary>
+        /// Compact start population produced by independent Default runs.
+        /// Full solver states are intentionally not retained here.
+        /// </summary>
+        public IReadOnlyList<ScheduleGenome> InitialGenomes { get; private set; } = Array.Empty<ScheduleGenome>();
 
         public async Task<List<AlgorithmResultDTO>> Run(FacultySeasonDTO root, UserFunctions userFunctions, Dictionary<string, string> parameters, bool ignoreClassrooms, ILogger logger, CancellationToken cancellationToken = default)
         {
@@ -55,16 +62,42 @@ namespace AcaTime.Algorithm.Genetic.Services
             // Створюємо завдання для паралельного обчислення
             var tasks = new List<Task<AlgorithmResultDTO>>();
             var results = new ConcurrentBag<AlgorithmResultDTO>();
+
+            // time for one iteration
+            var initialPopulationSize = Math.Max(1, runParameters.InitialPopulationSize);
+
+            // Паралельні сіди: кожен сід = власний клон стану (незалежні
+            // об'єктні графи — Root.Clone на кожного). Бюджет потоків =
+            // ProcessorCount - 1 (cgroup-aware у .NET 6+: Docker/K8s ліміти
+            // враховуються) з override ParallelLineages — не перевищуємо те,
+            // що виділив адмін.
+            var seedWorkers = Math.Max(1, Math.Min(initialPopulationSize,
+                runParameters.ParallelLineages > 0
+                    ? runParameters.ParallelLineages
+                    : Math.Max(1, Environment.ProcessorCount - 1)));
+
+            // Сіди ПОСЛІДОВНО: паралельні сіди НЕ thread-safe (20260831-131416:
+            // 3/5 ранів KeyNotFoundException у ForwardCheck — shared state між
+            // клонами Default-юніта; вимагає аудиту Default-кодбази).
+            // Lineages (Genetic) паралельні БЕЗПЕЧНО — кожен має власний граф.
             ParallelOptions parallelOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount > 4 ? Environment.ProcessorCount / 4 : 1,
+                MaxDegreeOfParallelism = 1,
                 CancellationToken = linkedCts.Token
             };
 
-            // time for one iteration
-            var timeOneSec = runParameters.TimeoutInSeconds * parallelOptions.MaxDegreeOfParallelism / runParameters.MaxIterations;
+            // per-seed cap: стіна фази сідів = N × timeOneSec (послідовно)
+            var timeOneSec = runParameters.TimeoutInSeconds / initialPopulationSize;
+
+            // КЛОНУВАННЯ СІДІВ ПОСЛІДОВНЕ (Clone не thread-safe — конкурентні
+            // клони дали KeyNotFoundException у ForwardCheck, 131113), тільки
+            // RUN-и паралельні: кожен юніт — власний об'єктний граф.
+            var seedUnits = new List<DefaultScheduleAlgorithmUnit>(initialPopulationSize);
+            for (var i = 0; i < initialPopulationSize; i++)
+                seedUnits.Add(defaultUnit.Clone());
 
             statistics = new AlgorithmStatistics();
+            var initialGenomes = new ConcurrentBag<ScheduleGenome>();
 
             try
             {
@@ -72,14 +105,12 @@ namespace AcaTime.Algorithm.Genetic.Services
 
                 logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
                 await Parallel.ForEachAsync(
-                    // Enumerable.Range(0, 1),
-                    Enumerable.Range(0, 1),
-                    // Enumerable.Range(0, parallelOptions.MaxDegreeOfParallelism),
+                    Enumerable.Range(0, initialPopulationSize),
                     parallelOptions,
                     async (i, token) =>
                     {
                         // var unit = defaultUnit.Clone();
-                        var unit = defaultUnit.Clone();
+                        var unit = seedUnits[i];
 
                         // set timeout for one iteration
                         var timeoutOneCts = new CancellationTokenSource();
@@ -93,13 +124,13 @@ namespace AcaTime.Algorithm.Genetic.Services
                         
                         var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
                         
-                        if (result != null)
-                        {
-                            lock (results)
-                            {
+                          if (result != null)
+                          {
+                                   lock (results)
+                                   {
                                 statistics.Success++;
                                 result.Name = "Default";
-                                results.Add(result);
+                                initialGenomes.Add(ScheduleGenome.FromResult(result));
                                 if (savedUnit == null)
                                 {
                                     savedUnit = unit;
@@ -109,18 +140,7 @@ namespace AcaTime.Algorithm.Genetic.Services
                                 {
                                     savedUnit = unit;
                                 }
-                                // Сортуємо та обмежуємо кількість результатів при необхідності
-                                if (results.Count > runParameters.ResultsCount)
-                                {
-                                    var sortedResults = results.OrderByDescending(x => x.TotalEstimation).Take(runParameters.ResultsCount).ToList();
-                                    results.Clear();
-                                    foreach (var sortedResult in sortedResults)
-                                    {
-                                        results.Add(sortedResult);
-                                    }                                    
-                                }
-
-                                statistics.BestResult = results.Max(x => x.TotalEstimation);
+                                statistics.BestResult = Math.Max(statistics.BestResult, result.TotalEstimation);
                             }
                         }
                         else
@@ -136,6 +156,19 @@ namespace AcaTime.Algorithm.Genetic.Services
             }
 
             logger.LogInformation($"Завершено розрахунку. Кількість успішних результатів: {statistics.Success}, Найкращий результат: {statistics.BestResult}");
+            InitialGenomes = initialGenomes.ToList();
+
+            // Keep only one full solver state during the initial population phase.
+            // The remaining candidates are represented by compact genomes.
+            if (savedUnit != null)
+            {
+                results.Add(new AlgorithmResultDTO
+                {
+                    TotalEstimation = savedUnit.Estimate(),
+                    ScheduleSlots = savedUnit.Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList(),
+                    Name = "Default"
+                });
+            }
             
             // Повертаємо найкращі результати
             var res = results
@@ -145,17 +178,7 @@ namespace AcaTime.Algorithm.Genetic.Services
 
             if (res.Count > 0)
             {
-                var result = res[0];
-                
-                var defaultResultUnit = savedUnit.CloneFromDefault();
-                result.ScheduleSlots = defaultResultUnit.Slots.Values.Where(v => v.IsAssigned).Select(x => x.ScheduleSlot).ToList();
-
                 var defaultResult = res[0];
-                
-                // var unit = savedUnit.CloneWithPrivateCache();
-                var unit = savedUnit.CloneFromDefault();
-                // var unit = defaultUnit.Clone();
-                unit.initialResult = new AlgorithmResultDTO();
                 
                 // logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. DEFAULT RESULT: {defaultResult.TotalEstimation}");
                 // logger.LogInformation($"ПОЧИНАЄМО РАХУВАТИ. GENETIC START: {unit.initialResult.TotalEstimation}");
@@ -163,12 +186,28 @@ namespace AcaTime.Algorithm.Genetic.Services
                 var before = defaultResult.TotalEstimation;
                 
                 // Calculate(unit);
-                var algoRes = await Cal(RunParameters, ignoreClassrooms, cancellationToken);
+                 // Default generation and Genetic branches have independent budgets.
+                 // The initial population phase can otherwise consume the shared token
+                 // before the short kick branches get a chance to run.
+                 var algoRes = await Cal(RunParameters, ignoreClassrooms);
                 // var r = algoRes.Select(r => r).OrderBy(r => r.TotalEstimation).First();
-                res.AddRange(algoRes.Select(r => r).OrderBy(r => r.TotalEstimation));
+                // Never expose a Genetic result that is worse than the Default
+                // result; Default remains the safe production baseline.
+                res.AddRange(algoRes
+                    .Where(r => r.TotalEstimation > before)
+                    .OrderBy(r => r.TotalEstimation));
+                res = res
+                    .OrderByDescending(r => r.TotalEstimation)
+                    .Take(runParameters.ResultsCount)
+                    .ToList();
 
-                // res.Insert(0, r);
-                var after = unit.initialResult.TotalEstimation;
+                // The genetic unit used by Cal owns the actual result. The
+                // separate compatibility field initialResult is not populated
+                // by this path and must not be used for diagnostics.
+                var after = res
+                    .Select(x => x.TotalEstimation)
+                    .DefaultIfEmpty(before)
+                    .Max();
                 logger.LogInformation($"БУЛО: {before}");
                 logger.LogInformation($"СТАЛО: {after}");
 
@@ -189,53 +228,82 @@ namespace AcaTime.Algorithm.Genetic.Services
 
             ParallelOptions parallelOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount > 4 ? Environment.ProcessorCount / 4 : 1,
+                // Each lane owns a large mutable solver state.
+                MaxDegreeOfParallelism = Math.Max(1, runParameters.MaxParallelBranches),
                 CancellationToken = linkedCts.Token
             };
 
-            // time for one iteration
-            var timeOneSec = runParameters.TimeoutInSeconds * parallelOptions.MaxDegreeOfParallelism / runParameters.MaxIterations;
-
+            var rankedSeeds = InitialGenomes
+                .OrderByDescending(x => x.Fitness ?? int.MinValue)
+                .ToList();
+            var bestSeedScore = rankedSeeds.FirstOrDefault()?.Fitness ?? int.MinValue;
+            var minimumBranchScore = bestSeedScore == int.MinValue
+                ? int.MinValue
+                : (int)(bestSeedScore * runParameters.PopulationBranchMinimumScoreRatio);
+            var populationSeeds = rankedSeeds
+                .Where(x => (x.Fitness ?? int.MinValue) >= minimumBranchScore)
+                .Take(Math.Max(1, runParameters.PopulationBranches))
+                .ToList();
+            logger.LogInformation(
+                $"Population seeds: {populationSeeds.Count}/{rankedSeeds.Count}, " +
+                $"мінімальний score гілки {minimumBranchScore}");
             statistics = new AlgorithmStatistics();
             var results = new ConcurrentBag<AlgorithmResultDTO>();
+            var branchOutcomes = new ConcurrentBag<(AlgorithmResultDTO Result, IReadOnlyList<ScheduleDeltaEvent> Deltas)>();
+            var branchCount = populationSeeds.Count;
 
             try
             {
                 // Запускаємо паралельні обчислення
 
-                logger.LogInformation($"Початок розрахунку. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
-                await Parallel.ForEachAsync(
-                    // Enumerable.Range(0, 1),
-                    // Enumerable.Range(0, 1),
-                    Enumerable.Range(0, 1),
-                    parallelOptions,
-                    async (i, token) =>
-                    {
+                 logger.LogInformation($"Початок розрахунку. Кількість гілок: {branchCount}. Кількість ітерацій: {runParameters.MaxIterations}. Кількість паралельних обчислень: {parallelOptions.MaxDegreeOfParallelism}");
+                 await Parallel.ForEachAsync(
+                     Enumerable.Range(0, branchCount),
+                     parallelOptions,
+                     async (i, token) =>
+                     {
+                         var seed = populationSeeds[i];
                         // var unit = defaultUnit.Clone();
                         // var unit = defaultUnit.Clone();
                         
-                        GeneticScheduleAlgorithmUnit unit = savedUnit.CloneFromDefault();
+                         GeneticScheduleAlgorithmUnit unit = savedUnit.CloneFromDefault();
 
-                        // set timeout for one iteration
-                        var timeoutOneCts = new CancellationTokenSource();
-                        var linkedOneCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutOneCts.Token, token);
+                             // Classroom placement is a shared resource and is
+                             // repaired separately after the time genes transfer.
+                              unit.ApplyGenome(seed, applyClassrooms: false);
+                              var laneName = i == 0 ? "population-best" : $"population-{i + 1}";
+                              logger.LogInformation($"Genetic lane: {laneName}, стартовий score {unit.Estimate()}");
 
-                        timeoutOneCts.CancelAfter(TimeSpan.FromSeconds(timeOneSec));
+                          // set timeout for one iteration
+                         var timeoutOneCts = new CancellationTokenSource();
+                          var linkedOneCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutOneCts.Token, token);
+
+                         var timeoutSeconds = i == 0
+                             ? runParameters.TimeoutInSeconds
+                             : runParameters.KickTimeoutInSeconds;
+                         timeoutOneCts.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
 
                         // var res = await unit.Run(root, userFunctions, null, ignoreClassrooms, logger, linkedOneCts.Token);
                         // var result = res.Count != 0 ? res[0] : null;
                         
-                        var result = await unit.Run(linkedOneCts.Token, ignoreClassrooms).ConfigureAwait(false);
+                          var result = await unit.Run(
+                              linkedOneCts.Token,
+                              ignoreClassrooms,
+                              hgtDonors: null,
+                              kick: false,
+                              iterationsOverride: i == 0
+                                  ? runParameters.GeneticIterations
+                                  : runParameters.PopulationBranchIterations).ConfigureAwait(false);
                         
-                        if (result != null)
-                        {
-                            lock (results)
-                            {
-                                statistics.Success++;
-                                result.Name = GetName();
-                                results.Add(result);
-                                
-                                // Сортуємо та обмежуємо кількість результатів при необхідності
+                         if (result != null)
+                         {
+                                  lock (results)
+                                  {
+                                      statistics.Success++;
+                                   result.Name = GetName();
+                                   results.Add(result);
+                                   branchOutcomes.Add((result, unit.AcceptedDeltaEvents));
+                                 // Сортуємо та обмежуємо кількість результатів при необхідності
                                 // if (results.Count > runParameters.ResultsCount)
                                 // {
                                 //     var sortedResults = results.OrderByDescending(x => x.TotalEstimation).Take(runParameters.ResultsCount).ToList();
@@ -246,14 +314,37 @@ namespace AcaTime.Algorithm.Genetic.Services
                                 //     }                                    
                                 // }
 
-                                statistics.BestResult = results.Max(x => x.TotalEstimation);
-                            }
-                        }
-                        else
-                        {
-                            statistics.Failed++;
-                        }
-                    });
+                                      statistics.BestResult = results.Max(x => x.TotalEstimation);
+                                   }
+                          }
+                          else
+                          {
+                              lock (results)
+                              {
+                                  statistics.Failed++;
+                                  // A branch can still be a delta recipient even when it
+                                  // did not improve its own starting score.
+                                  branchOutcomes.Add((
+                                      new AlgorithmResultDTO
+                                      {
+                                          Name = GetName(),
+                                          TotalEstimation = unit.Estimate(),
+                                          ScheduleSlots = unit.Slots.Values
+                                              .Where(x => x.IsAssigned)
+                                              .Select(x => x.ScheduleSlot)
+                                              .ToList()
+                                      },
+                                      unit.AcceptedDeltaEvents));
+                              }
+                          }
+                      });
+
+                 await TryTransferAcceptedDelta(
+                     branchOutcomes.ToList(),
+                     runParameters,
+                     ignoreClassrooms,
+                     linkedCts.Token,
+                     results).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -262,6 +353,211 @@ namespace AcaTime.Algorithm.Genetic.Services
             }
 
             return results;
+        }
+
+        private async Task TryTransferAcceptedDelta(
+            IReadOnlyList<(AlgorithmResultDTO Result, IReadOnlyList<ScheduleDeltaEvent> Deltas)> outcomes,
+            AlgorithmParams runParameters,
+            bool ignoreClassrooms,
+            CancellationToken cancellationToken,
+            ConcurrentBag<AlgorithmResultDTO> results)
+        {
+            if (outcomes.Count < 2)
+                return;
+
+            var recipient = outcomes.OrderByDescending(x => x.Result.TotalEstimation).First();
+            var positiveDeltas = outcomes
+                .Where(x => !ReferenceEquals(x.Result, recipient.Result))
+                .SelectMany(x => x.Deltas)
+                .Where(x => x.ScoreDelta > 0)
+                .OrderByDescending(x => x.ScoreDelta)
+                .DistinctBy(x => string.Join(
+                    ";",
+                    x.Changes
+                        .OrderBy(change => change.Key.GroupSubjectId)
+                        .ThenBy(change => change.Key.SlotId)
+                        .ThenBy(change => change.Key.LessonNumber)
+                        .Select(change =>
+                            $"{change.Key.GroupSubjectId}:{change.Key.SlotId}:{change.Key.LessonNumber}:" +
+                            $"{change.Value.Date.Ticks}:{change.Value.PairNumber}:{change.Value.ClassroomId}")))
+                .ToList();
+            if (positiveDeltas.Count == 0)
+            {
+                logger.LogInformation("Delta transfer: немає позитивної delta для переносу");
+                return;
+            }
+
+            var recombinations = positiveDeltas
+                .Take(5)
+                .SelectMany((first, index) => positiveDeltas
+                    .Skip(index + 1)
+                    .Take(5)
+                    .Select(second => ScheduleDeltaEvent.Combine(first, second)))
+                .Where(x => x != null)
+                .Cast<ScheduleDeltaEvent>();
+            var deltas = positiveDeltas
+                .Concat(recombinations)
+                .OrderByDescending(x => x.ScoreDelta)
+                .Take(Math.Max(1, runParameters.OperationAttemptsPerIteration))
+                .ToList();
+
+            logger.LogInformation($"Delta transfer: відібрано {deltas.Count} унікальних delta");
+
+            var transferResults = new ConcurrentBag<AlgorithmResultDTO>();
+            await Parallel.ForEachAsync(
+                deltas,
+                new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Math.Max(1, runParameters.MaxParallelBranches),
+                    CancellationToken = cancellationToken
+                },
+                async (delta, token) =>
+                {
+                    var candidate = ScheduleGenome.FromResult(recipient.Result);
+                    delta.ApplyTo(candidate);
+                    var unit = savedUnit.CloneFromDefault();
+                    unit.ApplyGenome(candidate, applyClassrooms: false);
+                    var startScore = unit.Estimate();
+                    logger.LogInformation(
+                        $"Delta transfer: recipient {recipient.Result.TotalEstimation}, " +
+                        $"delta {delta.ScoreDelta}, стартовий score {startScore}");
+
+                    var transferredResult = startScore > recipient.Result.TotalEstimation
+                        ? new AlgorithmResultDTO
+                        {
+                            TotalEstimation = startScore,
+                            ScheduleSlots = unit.Slots.Values
+                                .Where(x => x.IsAssigned)
+                                .Select(x => x.ScheduleSlot)
+                                .ToList()
+                        }
+                        : null;
+
+                    using var timeoutCts = new CancellationTokenSource();
+                    timeoutCts.CancelAfter(TimeSpan.FromSeconds(runParameters.KickTimeoutInSeconds));
+                    using var linked = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, token);
+                    var result = await unit.Run(
+                        linked.Token,
+                        ignoreClassrooms,
+                        hgtDonors: null,
+                        kick: false,
+                        iterationsOverride: runParameters.DeltaTransferIterations).ConfigureAwait(false);
+
+                    var candidateResult = result != null && (transferredResult == null || result.TotalEstimation > transferredResult.TotalEstimation)
+                        ? result
+                        : transferredResult;
+                    if (candidateResult != null)
+                        transferResults.Add(candidateResult);
+                }).ConfigureAwait(false);
+
+            var bestTransfer = transferResults
+                .OrderByDescending(x => x.TotalEstimation)
+                .FirstOrDefault();
+
+            if (bestTransfer != null && bestTransfer.TotalEstimation > recipient.Result.TotalEstimation)
+            {
+                bestTransfer.Name = GetName();
+                results.Add(bestTransfer);
+                logger.LogInformation($"Delta transfer прийнято: {recipient.Result.TotalEstimation} -> {bestTransfer.TotalEstimation}");
+            }
+            else
+                logger.LogInformation("Delta transfer відхилено");
+        }
+
+        private ScheduleGenome? SelectHgtSeed(out List<long> transferredBlockIds)
+        {
+            transferredBlockIds = new List<long>();
+            var recipient = InitialGenomes
+                .OrderByDescending(x => x.Fitness ?? int.MinValue)
+                .FirstOrDefault();
+            if (recipient == null)
+                return null;
+
+            if (RunParameters.HgtAttempts <= 0 || RunParameters.HgtBlockCount <= 0)
+            {
+                logger.LogInformation("HGT: вимкнено параметрами");
+                return recipient;
+            }
+
+            var donor = InitialGenomes
+                .Where(x => !ReferenceEquals(x, recipient))
+                .OrderByDescending(x => x.Fitness ?? int.MinValue)
+                .FirstOrDefault();
+            if (donor == null)
+                return recipient;
+
+            var candidates = InitialGenomes
+                .Where(x => !ReferenceEquals(x, recipient))
+                .OrderByDescending(x => x.Fitness ?? int.MinValue)
+                .Take(Math.Max(1, RunParameters.HgtAttempts))
+                .SelectMany(donorGenome => donorGenome.Genes.Keys
+                    .Select(x => x.GroupSubjectId)
+                    .Distinct()
+                    .Select(id => new { Donor = donorGenome, Id = id, Differences = CountBlockDifferences(recipient, donorGenome, id) }))
+                .Where(x => x.Differences > 0)
+                .OrderByDescending(x => (x.Donor.Fitness ?? int.MinValue, x.Differences))
+                .Take(Math.Max(1, RunParameters.HgtAttempts))
+                .ToList();
+
+            ScheduleGenome? bestHgt = null;
+            var bestHgtScore = int.MinValue;
+            foreach (var candidate in candidates)
+            {
+                var child = recipient.Clone();
+                var changes = child.TransferGroupSubjectFrom(candidate.Donor, candidate.Id);
+                changes.Commit();
+
+                var evaluated = EvaluateHgtCandidate(child, candidate.Id, out var repairedGenome, out var rawScore, out var repairedScore, out var repairSucceeded);
+                logger.LogInformation(
+                    $"HGT: донор {candidate.Donor.Fitness}, реципієнт {recipient.Fitness}, " +
+                    $"GroupSubject {candidate.Id}, генів змінено {candidate.Differences}, " +
+                    $"score {rawScore} -> repair {repairedScore}, repair {(repairSucceeded ? "успішний" : "невдалий")}");
+
+                if (evaluated && repairedScore > bestHgtScore)
+                {
+                    bestHgt = repairedGenome;
+                    bestHgtScore = repairedScore;
+                    transferredBlockIds = [candidate.Id];
+                }
+            }
+
+            logger.LogInformation($"HGT: найкращий offspring score {bestHgtScore}, спроб {candidates.Count}");
+            return bestHgt ?? recipient;
+        }
+
+        private bool EvaluateHgtCandidate(
+            ScheduleGenome candidate,
+            long blockId,
+            out ScheduleGenome repairedGenome,
+            out int rawScore,
+            out int repairedScore,
+            out bool repairSucceeded)
+        {
+            var unit = savedUnit.CloneFromDefault();
+            unit.ApplyGenome(candidate, applyClassrooms: false);
+            rawScore = unit.Estimate();
+            repairSucceeded = unit.TryRepairGroupSubjects([blockId]);
+            repairedScore = unit.Estimate();
+            repairedGenome = ScheduleGenome.FromSlots(
+                unit.Slots.Values.Where(x => x.IsAssigned).Select(x => x.ScheduleSlot),
+                repairedScore);
+            return repairSucceeded;
+        }
+
+        private static int CountDifferences(ScheduleGenome left, ScheduleGenome right)
+        {
+            return left.Genes.Keys
+                .Union(right.Genes.Keys)
+                .Count(key => !left.Genes.TryGetValue(key, out var leftGene) ||
+                             !right.Genes.TryGetValue(key, out var rightGene) ||
+                             leftGene != rightGene);
+        }
+
+        private static int CountBlockDifferences(ScheduleGenome recipient, ScheduleGenome donor, long blockId)
+        {
+            return donor.Genes
+                .Where(x => x.Key.GroupSubjectId == blockId)
+                .Count(x => !recipient.Genes.TryGetValue(x.Key, out var gene) || gene != x.Value);
         }
         
         /// <summary>
@@ -809,6 +1105,262 @@ namespace AcaTime.Algorithm.Genetic.Services
                     Description = "Кількість ітерацій",
                     DataType = AlgorithmParameterType.Decimal,
                     DefaultValue = "100",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "InitialPopulationSize",
+                    Description = "Кількість незалежних стартових Default-рішень",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "HgtAttempts",
+                    Description = "Кількість спроб HGT",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "HgtBlockCount",
+                    Description = "Кількість блоків HGT",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "KickAfterStagnation",
+                    Description = "Кількість ітерацій без покращення до kick",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "6",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "KickSeriesCount",
+                    Description = "Кількість серій у kick",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "2",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "KickLocalIterations",
+                    Description = "Кількість ітерацій короткої kick-гілки",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "8",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "KickBranches",
+                    Description = "Кількість незалежних kick-гілок",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "0",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "KickTimeoutInSeconds",
+                    Description = "Таймаут однієї kick-гілки",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "20",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "PopulationBranches",
+                    Description = "Кількість незалежних population-гілок",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "PopulationBranchIterations",
+                    Description = "Кількість ітерацій додаткової population-гілки",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "25",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "MaxParallelBranches",
+                    Description = "Максимальна кількість одночасних population-гілок",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "IntraBranchPopulationSize",
+                    Description = "Кількість повних Individual усередині однієї гілки",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "OperationAttemptsPerIteration",
+                    Description = "Кількість Genetic-операцій на одного індивідуума за ітерацію",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "MutationTournamentAttempts",
+                    Description = "Кількість спроб вибору серії у mutation tournament",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "3",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "MutationDomainCandidates",
+                    Description = "Максимальна кількість доменів для перевірки на одну серію",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "8",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "DeltaTransferIterations",
+                    Description = "Кількість ітерацій Genetic для delta transfer",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "8",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "DestroyRepairSeriesCount",
+                    Description = "Кількість серій у destroy-repair",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "2",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "DestroyRepairMaxMilliseconds",
+                    Description = "Ліміт часу destroy-repair",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "300",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "DestroyRepairMaxAcceptedLoss",
+                    Description = "Максимальне тимчасове погіршення destroy-repair",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1000",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "DestroyRepairAttempts",
+                    Description = "Кількість спроб destroy-repair",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "3",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "DestroyRepairRelocalIterations",
+                    Description = "Кількість легких мутацій для спуску після прийнятої втрати destroy-repair (0 = вимкнено)",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "0",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "AdaptiveOperationPortfolio",
+                    Description = "Адаптивний вибір Genetic-операцій",
+                    DataType = AlgorithmParameterType.Boolean,
+                    DefaultValue = "true",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "IlsStagnationLimit",
+                    Description = "Скільки ітерацій без покращення запускають ILS-епізод (kick робочого базису в гірший басейн; 0 = вимкнено)",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "12",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "IlsRepairIterations",
+                    Description = "Бюджет ітерацій на відновлення після ILS-kick",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "20",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "IlsKickSeriesCount",
+                    Description = "Кількість серій у ILS-kick (розмір збурення)",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "2",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "IlsChainKickLoss",
+                    Description = "Втрата, прийнятна для ILS-kick relocation серії (chain-relocate); 0 = старий TryPerturb-режим",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "0",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "IlsChainKickMoves",
+                    Description = "Кількість послідовних chain-kick ходів в одному ILS-збуренні",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "ChainDirected",
+                    Description = "Chain-relocate: турнірний скан (серія × домен × B, найкраща дельта) замість випадкового першого покращення",
+                    DataType = AlgorithmParameterType.Boolean,
+                    DefaultValue = "true",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "HgtInterval",
+                    Description = "Інтервал HGT-міграції (ітерацій): прийняті події лідера реплаються на laggard; 0 = вимкнено",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "0",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "ParallelLineages",
+                    Description = "Бюджет паралельних потоків: 0 = авто (ProcessorCount-1, cgroup-aware), N = жорсткий ліміт",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "0",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "OnlyOperation",
+                    Description = "Діагностика: -1 = звичайний цикл операцій; 0..6 = виконувати лише цю операцію",
+                    DataType = AlgorithmParameterType.Integer,
+                    DefaultValue = "-1",
+                    IsRequired = false
+                },
+                new AlgorithmParameterDTO
+                {
+                    Name = "CheapEvaluation",
+                    Description = "Дешева інкрементальна оцінка правил (чорна скірня з верифікацією; відкат на повну оцінку при розбіжності)",
+                    DataType = AlgorithmParameterType.Boolean,
+                    DefaultValue = "false",
                     IsRequired = false
                 }
             };

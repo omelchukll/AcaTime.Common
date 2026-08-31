@@ -59,3 +59,7 @@ TestResults/
 
 ## Ігнорування Rider/Idea
 .idea/
+
+## Локальні артефакти бенчмарків і нотатки розробки
+benchmark-results/
+ALGORITHM-NOTES*

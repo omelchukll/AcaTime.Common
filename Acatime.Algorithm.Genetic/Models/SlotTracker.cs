@@ -1,24 +1,72 @@
 ﻿using AcaTime.ScheduleCommon.Models.Calc;
+using AcaTime.Algorithm.Genetic.Services.CheapEval;
 
 namespace AcaTime.Algorithm.Genetic.Models
 {
     public class SlotTracker
     {
         /// <summary>
+        /// Рушій дешевої оцінки цього індивідуума (null поки не ініціалізовано).
+        /// </summary>
+        internal CheapEvaluationEngine? CheapEngine;
+
+        /// <summary>Ознака незберігеної зміни позиції для дешевої оцінки.</summary>
+        internal bool CheapDirty;
+        internal DateTime CheapPrevDate;
+        internal int CheapPrevPair;
+
+        /// <summary>
         /// Слот, для якого ведеться трекінг.
         /// </summary>
         public ScheduleSlotDTO ScheduleSlot { get; set; }
+
+        // Copy-on-write для AvailableDomains/RejectedDomains: клон індивідуума
+        // поділяє колекції з джерелом (але не мутує їх без копіювання).
+        // true = колекція ексклюзивна (новостворені трекери, після forWrite).
+        internal bool DomainsOwned = true;
+        internal bool RejectedOwned = true;
 
         /// <summary>
         /// Доступні доменні значення (наприклад, дата та номер пари).
         /// </summary>
         public SortedSet<DomainValue> AvailableDomains { get; set; } = new SortedSet<DomainValue>();
 
+        private SortedSet<DomainValue> AvailableDomainsForWrite()
+        {
+            if (!DomainsOwned)
+            {
+                AvailableDomains = new SortedSet<DomainValue>(AvailableDomains);
+                DomainsOwned = true;
+            }
+            return AvailableDomains;
+        }
+
         /// <summary>
         /// Відкинуті доменні значення, розбиті за кроками пошуку.
         /// Ключ – номер кроку, значення – список вилучених доменів.
         /// </summary>
         public Dictionary<int, List<DomainValue>> RejectedDomains { get; set; } = new Dictionary<int, List<DomainValue>>();
+
+        private Dictionary<int, List<DomainValue>> RejectedDomainsForWrite()
+        {
+            if (!RejectedOwned)
+            {
+                RejectedDomains = RejectedDomains.ToDictionary(kvp => kvp.Key, kvp => new List<DomainValue>(kvp.Value));
+                RejectedOwned = true;
+            }
+            return RejectedDomains;
+        }
+
+        /// <summary>
+        /// Реєструє вилучені домени для кроку пошуку (COW: копіює словник за потреби).
+        /// </summary>
+        internal void AddRejectedDomains(int step, List<DomainValue> removed)
+        {
+            var rejected = RejectedDomainsForWrite();
+            if (!rejected.ContainsKey(step))
+                rejected[step] = new List<DomainValue>();
+            rejected[step].AddRange(removed);
+        }
 
         /// <summary>
         /// Прапорець, що позначає, чи був для цього слоту зроблений вибір.
@@ -38,14 +86,30 @@ namespace AcaTime.Algorithm.Genetic.Models
         public void SetDomain(DomainValue val, int step)
         {
             AssignStep = step;
-            ScheduleSlot.Date = val.Date;
-            ScheduleSlot.PairNumber = val.PairNumber;
+            SetDomainRaw(val.Date, val.PairNumber);
         }
 
         public void SetDomain(DomainValue val)
         {
-            ScheduleSlot.Date = val.Date;
-            ScheduleSlot.PairNumber = val.PairNumber;
+            SetDomainRaw(val.Date, val.PairNumber);
+        }
+
+        /// <summary>
+        /// Єдина точка мутації позиції слота: фіксує попередню синхронізовану
+        /// позицію для дешевої оцінки і оновлює поля, які бачать скрипти.
+        /// </summary>
+        internal void SetDomainRaw(DateTime date, int pair)
+        {
+            if (CheapEngine != null && !CheapDirty &&
+                (ScheduleSlot.Date != date || ScheduleSlot.PairNumber != pair))
+            {
+                CheapDirty = true;
+                CheapPrevDate = ScheduleSlot.Date;
+                CheapPrevPair = ScheduleSlot.PairNumber;
+                CheapEngine.NoteDirty(this);
+            }
+            ScheduleSlot.Date = date;
+            ScheduleSlot.PairNumber = pair;
         }
 
         /// <summary>
@@ -58,14 +122,16 @@ namespace AcaTime.Algorithm.Genetic.Models
         {
             if (RejectedDomains.ContainsKey(step))
             {
-                foreach (var domain in RejectedDomains[step])
+                var restored = RejectedDomains[step];
+                var available = AvailableDomainsForWrite();
+                foreach (var domain in restored)
                 {
-                    if (!AvailableDomains.Contains(domain))
+                    if (!available.Contains(domain))
                     {
-                        AvailableDomains.Add(domain);
+                        available.Add(domain);
                     }
                 }
-                RejectedDomains.Remove(step);
+                RejectedDomainsForWrite().Remove(step);
             }
         }
 
